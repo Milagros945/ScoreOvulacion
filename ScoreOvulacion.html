@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScoreOvulación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F6;
+  --bg-deep:#F1ECE9;
+  --ink:#2B2730;
+  --ink-soft:#79737E;
+  --ink-faint:#AEA8B1;
+  --grad-a:#F3D0C8;
+  --grad-b:#D8C2DE;
+  --grad-c:#B9D4D6;
+  --hero-gradient:linear-gradient(135deg, var(--grad-a) 0%, var(--grad-b) 55%, var(--grad-c) 100%);
+  --accent:#7A6482;
+  --accent-tint:#F1EAF1;
+  --gold:#7A6482;
+  --gold-tint:#F1EAF1;
+  --green:#71937D;
+  --green-tint:#E7EFE9;
+  --amber:#B58F63;
+  --amber-tint:#F3EADD;
+  --red:#B47A6F;
+  --red-tint:#F4E3DE;
+  --card:#FFFFFF;
+  --dark:#0E2F52;
+  --dark-gradient:linear-gradient(135deg, #0B3856 0%, #146E9E 55%, #4FC0E8 100%);
+  --radius-lg:28px;
+  --radius-md:20px;
+  --radius-sm:14px;
+  --shadow:0 26px 55px -24px rgba(35,31,41,0.22);
+  --shadow-soft:0 14px 32px -18px rgba(35,31,41,0.14);
+  --shadow-hero:0 28px 55px -20px rgba(122,100,130,0.30);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(circle at 12% -8%, var(--bg-deep) 0%, transparent 42%),
+    radial-gradient(circle at 105% 12%, #F1E6EC 0%, transparent 38%),
+    var(--bg);
+  color:var(--ink);
+  font-family:'Manrope',sans-serif;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.serif{font-family:'Fraunces',serif;}
+.wrap{max-width:600px;margin:0 auto;padding:0 20px 120px;position:relative;}
+.screen{display:none;animation:fadeUp .5s ease both;}
+.screen.active{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+@media (prefers-reduced-motion: reduce){.screen{animation:none;}}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:20;background:rgba(247,244,245,.88);backdrop-filter:blur(10px);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(28,22,32,.06);}
+.brand{font-family:'Fraunces',serif;font-weight:600;font-size:18px;letter-spacing:.2px;color:var(--ink);display:flex;align-items:center;gap:8px;}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--hero-gradient);}
+.qprogress{font-size:12px;color:var(--ink-soft);font-weight:600;}
+.topbar.hidden{display:none;}
+
+/* ---------- cover ---------- */
+.cover{padding-top:22px;}
+.hero-card{position:relative;background:var(--hero-gradient);border-radius:32px;padding:34px 26px 30px;box-shadow:var(--shadow-hero);overflow:hidden;color:var(--ink);margin-bottom:22px;}
+.hero-card-photo{background-size:cover;background-position:center;min-height:300px;display:flex;flex-direction:column;justify-content:flex-end;}
+.hero-scrim{position:absolute;inset:0;background:linear-gradient(180deg, rgba(20,20,28,.15) 0%, rgba(20,20,28,.55) 100%);z-index:0;}
+.hero-eyebrow-light{color:rgba(255,255,255,.9)!important;}
+.heart-badge-light{background:rgba(255,255,255,.25)!important;color:#fff!important;}
+.hero-headline-light{color:#fff!important;text-shadow:0 2px 14px rgba(0,0,0,.25);}
+.hero-sub-light{color:rgba(255,255,255,.92)!important;text-shadow:0 1px 8px rgba(0,0,0,.2);}
+.hero-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% -10%, rgba(255,255,255,.35), transparent 55%);pointer-events:none;}
+.hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;position:relative;z-index:1;}
+.hero-eyebrow{font-size:11.5px;letter-spacing:2px;text-transform:uppercase;font-weight:800;color:rgba(43,39,48,.65);}
+.heart-badge{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.55);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);color:var(--ink);}
+.heart-badge svg{width:18px;height:18px;}
+.hero-headline{font-family:'Fraunces',serif;font-size:30px;line-height:1.18;font-weight:600;margin:0 0 12px;position:relative;z-index:1;color:var(--ink);}
+.hero-sub{font-size:14.5px;line-height:1.55;color:rgba(43,39,48,.75);max-width:420px;position:relative;z-index:1;margin:0;}
+.eyebrow{text-align:center;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px;}
+.headline{font-size:34px;line-height:1.15;text-align:center;font-weight:600;margin:0 0 14px;color:var(--ink);}
+.headline em{font-style:normal;color:var(--accent);}
+.subhead{text-align:center;color:var(--ink-soft);font-size:16px;line-height:1.55;max-width:440px;margin:0 auto 30px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:100px;padding:17px 26px;font-family:'Manrope',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease;}
+.btn-primary{background:var(--dark-gradient);color:#fff;box-shadow:0 16px 30px -14px rgba(20,110,158,.55);width:100%;}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--ink);border:1.5px solid rgba(28,22,32,.16);width:100%;}
+.btn-accent{background:var(--hero-gradient);color:var(--ink);width:100%;box-shadow:0 16px 30px -14px rgba(122,100,130,.35);}
+.cover-note{text-align:center;font-size:12.5px;color:var(--ink-faint);margin-top:14px;}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border-radius:var(--radius-lg);padding:28px;box-shadow:var(--shadow);margin-bottom:20px;}
+.card-soft{background:var(--card);border-radius:var(--radius-md);padding:22px;box-shadow:var(--shadow-soft);margin-bottom:16px;}
+.kicker{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px;}
+.section-title{font-size:24px;font-weight:600;margin:0 0 10px;}
+.section-body{color:var(--ink-soft);font-size:15px;line-height:1.6;}
+
+/* ---------- education table ---------- */
+.phase-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid rgba(44,31,44,.08);}
+.phase-row:last-child{border-bottom:none;}
+.phase-dot{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;}
+.phase-name{font-weight:700;font-size:14.5px;}
+.phase-detail{font-size:13px;color:var(--ink-soft);}
+
+/* ---------- quiz ---------- */
+.q-module{font-size:12px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:10px;}
+.q-text{font-size:22px;font-weight:600;line-height:1.3;margin-bottom:22px;font-family:'Fraunces',serif;}
+.options{display:flex;flex-direction:column;gap:10px;}
+.opt{border:1.5px solid rgba(44,31,44,.14);background:#fff;border-radius:var(--radius-sm);padding:15px 18px;font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;text-align:left;transition:.15s ease;}
+.opt:hover{border-color:var(--accent);}
+.opt.selected{border-color:var(--accent);background:var(--accent-tint);color:var(--accent);}
+.opt-sub{display:block;font-weight:500;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.num-input{width:100%;padding:16px 18px;font-size:20px;font-weight:700;border-radius:var(--radius-sm);border:1.5px solid rgba(44,31,44,.14);font-family:'Manrope',sans-serif;color:var(--ink);}
+.num-input:focus{outline:none;border-color:var(--accent);}
+.nav-btns{display:flex;gap:10px;margin-top:26px;}
+.nav-btns .btn{width:auto;flex:1;}
+.skip-link{display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--ink-faint);text-decoration:underline;cursor:pointer;}
+.progress-track{height:5px;background:rgba(44,31,44,.08);border-radius:10px;overflow:hidden;margin-bottom:26px;}
+.progress-fill{height:100%;background:var(--accent);border-radius:10px;transition:width .35s ease;}
+
+/* ---------- loading ---------- */
+.loading-screen{text-align:center;padding-top:80px;}
+.spinner{width:64px;height:64px;margin:0 auto 24px;border-radius:50%;border:4px solid var(--accent-tint);border-top-color:var(--accent);animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:16px;color:var(--ink-soft);font-weight:600;}
+
+/* ---------- gauge ---------- */
+/* ---------- score hero ---------- */
+.score-hero{text-align:left;}
+.score-hero-num{font-family:'Fraunces',serif;font-size:64px;font-weight:700;line-height:1;color:var(--ink);position:relative;z-index:1;}
+.score-hero-of{font-size:11.5px;letter-spacing:1.6px;color:rgba(43,39,48,.65);font-weight:800;margin-top:4px;margin-bottom:20px;position:relative;z-index:1;}
+.score-track{position:relative;height:14px;background:rgba(43,39,48,.14);border-radius:100px;overflow:hidden;z-index:1;}
+.score-track-fill{height:100%;width:0%;background:var(--ink);border-radius:100px;transition:width 1.3s cubic-bezier(.2,.8,.2,1);}
+.score-track-labels{display:flex;justify-content:space-between;margin-top:6px;font-size:11.5px;color:rgba(43,39,48,.55);font-weight:700;position:relative;z-index:1;}
+.zone-pill{display:inline-block;padding:8px 18px;border-radius:100px;font-weight:800;font-size:13px;letter-spacing:.4px;background:rgba(255,255,255,.85);color:var(--accent);}
+.zone-msg{margin-top:0;color:var(--ink-soft);font-size:14.5px;line-height:1.6;}
+.compare-wrap{margin-top:22px;text-align:left;}
+.compare-label{font-size:12.5px;color:var(--ink-soft);font-weight:700;margin-bottom:8px;}
+.compare-bar{position:relative;height:10px;background:rgba(28,22,32,.08);border-radius:10px;margin-bottom:6px;}
+.compare-fill{position:absolute;left:0;top:0;height:100%;border-radius:10px;background:var(--hero-gradient);}
+.compare-marker{position:absolute;top:-5px;width:2px;height:20px;background:var(--ink);}
+.compare-note{font-size:13px;color:var(--ink-soft);}
+
+/* ---------- category breakdown ---------- */
+.cat-row{margin-bottom:16px;}
+.cat-top{display:flex;justify-content:space-between;font-size:13.5px;font-weight:700;margin-bottom:6px;}
+.cat-bar{height:8px;border-radius:10px;background:rgba(44,31,44,.08);overflow:hidden;}
+.cat-fill{height:100%;border-radius:10px;}
+
+/* ---------- plan de accion ---------- */
+.step-card{display:flex;gap:14px;align-items:flex-start;padding:18px;border-radius:var(--radius-md);background:#fff;box-shadow:var(--shadow-soft);margin-bottom:12px;cursor:pointer;transition:.15s ease;}
+.step-card.done{opacity:.55;}
+.step-check{width:26px;height:26px;border-radius:50%;border:2px solid var(--accent);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;}
+.step-check.checked{background:var(--accent);}
+.step-check.checked::after{content:'✓';color:#fff;font-size:14px;font-weight:800;}
+.step-title{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+.step-body{font-size:13.5px;color:var(--ink-soft);line-height:1.5;}
+.plan-progress{font-size:13px;color:var(--ink-soft);font-weight:700;margin-bottom:14px;}
+.phase-block{margin-bottom:26px;}
+.phase-block-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.phase-badge{background:var(--ink);color:#fff;font-size:11px;font-weight:800;letter-spacing:.4px;padding:6px 12px;border-radius:100px;flex-shrink:0;}
+.phase-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;}
+.phase-goal{font-size:13px;color:var(--ink-soft);margin:-6px 0 14px;}
+
+/* ---------- accordion ---------- */
+.search-box{width:100%;padding:14px 16px;border-radius:var(--radius-sm);border:1.5px solid rgba(44,31,44,.14);font-size:14px;margin-bottom:16px;font-family:'Manrope',sans-serif;}
+.acc-item{background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow-soft);margin-bottom:10px;overflow:hidden;}
+.acc-head{padding:17px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:700;font-size:14.5px;gap:12px;}
+.acc-icon{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:14px;transition:transform .2s ease;}
+.acc-item.open .acc-icon{transform:rotate(45deg);}
+.acc-body{max-height:0;overflow:hidden;transition:max-height .3s ease;}
+.acc-item.open .acc-body{max-height:400px;}
+.acc-body-inner{padding:0 20px 18px;font-size:13.8px;color:var(--ink-soft);line-height:1.6;}
+
+/* ---------- bonos hub ---------- */
+.bonus-card{display:flex;gap:14px;align-items:center;background:#fff;border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-soft);margin-bottom:12px;cursor:pointer;}
+.bonus-icon{width:44px;height:44px;border-radius:50%;background:var(--hero-gradient);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;box-shadow:0 8px 18px -8px rgba(122,100,130,.45);}
+.bonus-title{font-weight:700;font-size:15px;}
+.bonus-sub{font-size:12.5px;color:var(--ink-soft);}
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.chip{background:var(--accent-tint);color:var(--accent);font-size:12px;font-weight:700;padding:6px 12px;border-radius:100px;}
+table.gen-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13.5px;}
+table.gen-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;color:var(--ink-faint);padding-bottom:8px;border-bottom:1.5px solid rgba(44,31,44,.1);}
+table.gen-table td{padding:10px 6px;border-bottom:1px solid rgba(44,31,44,.06);vertical-align:top;}
+.disclaimer{background:var(--amber-tint);border-radius:var(--radius-sm);padding:14px 16px;font-size:12.8px;color:#6b5320;margin-top:16px;line-height:1.5;}
+.pq-item{padding:12px 0;border-bottom:1px solid rgba(44,31,44,.08);font-size:14px;line-height:1.5;}
+.qa-block{padding:16px 0;border-bottom:1px solid rgba(44,31,44,.08);}
+.qa-block:last-child{border-bottom:none;}
+.qa-q{font-weight:700;font-size:14.5px;margin-bottom:6px;color:var(--ink);}
+.qa-a{font-size:13.8px;color:var(--ink-soft);line-height:1.6;}
+.qa-a strong{color:var(--accent);}
+.diet-item{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(44,31,44,.08);}
+.diet-item:last-child{border-bottom:none;}
+.diet-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);margin-top:7px;flex-shrink:0;}
+.diet-title{font-weight:700;font-size:14px;margin-bottom:3px;}
+.diet-body{font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+.block-row{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid rgba(44,31,44,.08);}
+.block-row:last-child{border-bottom:none;}
+.block-tag{flex-shrink:0;width:74px;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--accent);padding-top:2px;}
+.block-title{font-weight:700;font-size:14px;margin-bottom:3px;}
+.block-body{font-size:13.5px;color:var(--ink-soft);line-height:1.55;}
+.day-block{margin-bottom:16px;}
+.day-title{font-weight:700;font-size:14px;margin-bottom:6px;color:var(--accent);}
+.meal-row{font-size:13.5px;color:var(--ink-soft);margin-bottom:2px;}
+.shop-list{columns:2;column-gap:18px;font-size:13.5px;color:var(--ink-soft);margin-top:6px;}
+.shop-list div{break-inside:avoid;padding:3px 0;}
+
+/* ---------- learn tabs ---------- */
+.tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:18px;padding-bottom:2px;}
+.tab{flex-shrink:0;padding:10px 16px;border-radius:100px;font-size:13px;font-weight:700;background:#fff;color:var(--ink-soft);cursor:pointer;box-shadow:var(--shadow-soft);}
+.tab.active{background:var(--ink);color:#fff;}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);border-radius:100px;display:flex;gap:2px;padding:6px;box-shadow:0 20px 40px -12px rgba(44,31,44,.5);z-index:30;}
+.nav-item{background:transparent;border:none;color:rgba(255,255,255,.55);font-family:'Manrope',sans-serif;font-size:11.5px;font-weight:700;padding:10px 14px;border-radius:100px;cursor:pointer;}
+.nav-item.active{background:var(--accent);color:#fff;}
+
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--ink-soft);cursor:pointer;margin-bottom:16px;}
+
+@media (max-width:420px){
+  .headline{font-size:28px;}
+  .score-hero-num{font-size:52px;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar" id="topbar">
+  <div class="brand"><span class="dot"></span>ScoreOvulación</div>
+  <div class="qprogress" id="qProgressLabel"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- 0. COVER -->
+  <section class="screen active" id="screen-cover">
+    <div class="hero-card hero-card-photo" style="background-image:url('data:image/jpeg;base64,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');">
+      <div class="hero-scrim"></div>
+      <div class="hero-top">
+        <span class="hero-eyebrow hero-eyebrow-light">Índice de Fertilidad Real</span>
+        <span class="heart-badge heart-badge-light">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 7.8 2.3 4 6 4c2.1 0 3.6 1.1 4.5 2.4l1.5 2.1 1.5-2.1C14.4 5.1 15.9 4 18 4c3.7 0 5.6 3.8 4 7.2-2.5 4.7-10 9.3-10 9.3Z" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <h1 class="hero-headline hero-headline-light">Deja de googlear si <em>todavía puedes</em> quedar embarazada</h1>
+      <p class="hero-sub hero-sub-light">Convierte tu edad, tu historial y tus hábitos en un score claro, con un plan de 90 días que puedes empezar hoy.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goTo('education')">Calcular mi Score IFR</button>
+    <p class="cover-note">Toma 4 minutos · 27 preguntas · resultado inmediato</p>
+  </section>
+
+  <!-- 1. EDUCACION CORTA -->
+  <section class="screen" id="screen-education">
+    <div class="kicker">Antes de empezar</div>
+    <h2 class="section-title">Tu fertilidad no depende de un solo número</h2>
+    <p class="section-body">Depende de tu edad, tu regularidad hormonal, tu historial y varios factores más. Este test los mide todos juntos, no solo la edad.</p>
+    <div class="card-soft" style="margin-top:20px;">
+      <div class="phase-row">
+        <div class="phase-dot" style="background:#D7A9A0;">FOL</div>
+        <div><div class="phase-name">Fase folicular · días 1 a 13</div><div class="phase-detail">El ovario prepara varios óvulos. Uno se vuelve dominante.</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-dot" style="background:var(--accent);">OVU</div>
+        <div><div class="phase-name">Ovulación · día 14 aprox.</div><div class="phase-detail">Se libera el óvulo maduro. Tu ventana fértil real.</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-dot" style="background:var(--gold);">LÚT</div>
+        <div><div class="phase-name">Fase lútea · días 15 a 28</div><div class="phase-detail">El cuerpo se prepara para un posible embarazo.</div></div>
+      </div>
+      <div class="phase-row">
+        <div class="phase-dot" style="background:#B5A6B5;">MEN</div>
+        <div><div class="phase-name">Menstruación · días 1 a 5</div><div class="phase-detail">Sin implantación, el ciclo reinicia.</div></div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="startQuiz()">Empezar el test</button>
+  </section>
+
+  <!-- 2. QUIZ -->
+  <section class="screen" id="screen-quiz">
+    <div class="progress-track"><div class="progress-fill" id="quizProgressFill" style="width:0%"></div></div>
+    <div id="quizQuestion"></div>
+  </section>
+
+  <!-- 3. LOADING -->
+  <section class="screen" id="screen-loading">
+    <div class="loading-screen">
+      <div class="spinner"></div>
+      <div class="loading-text" id="loadingText">Calculando tu Score IFR...</div>
+    </div>
+  </section>
+
+  <!-- 4. RESULTADO -->
+  <section class="screen" id="screen-result">
+    <div class="hero-card score-hero">
+      <div class="hero-top">
+        <span class="hero-eyebrow">Tu Índice de Fertilidad Real</span>
+        <span class="heart-badge">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 20.5s-7.5-4.6-10-9.3C.4 7.8 2.3 4 6 4c2.1 0 3.6 1.1 4.5 2.4l1.5 2.1 1.5-2.1C14.4 5.1 15.9 4 18 4c3.7 0 5.6 3.8 4 7.2-2.5 4.7-10 9.3-10 9.3Z" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="score-hero-num" id="scoreNum">0</div>
+      <div class="score-hero-of">DE 100 PUNTOS</div>
+      <div class="score-track">
+        <div class="score-track-fill" id="scoreTrackFill"></div>
+      </div>
+      <div class="score-track-labels"><span>0</span><span>100</span></div>
+      <div style="margin-top:16px;"><span class="zone-pill" id="zonePill"></span></div>
+    </div>
+    <div class="card">
+      <p class="zone-msg" id="zoneMsg"></p>
+      <div class="compare-wrap">
+        <div class="compare-label">Tú vs. el promedio de tu grupo de edad</div>
+        <div class="compare-bar">
+          <div class="compare-fill" id="compareFill"></div>
+          <div class="compare-marker" id="compareMarker"></div>
+        </div>
+        <div class="compare-note" id="compareNote"></div>
+      </div>
+    </div>
+    <button class="btn btn-accent" onclick="goTo('breakdown')">Ver el desglose por factor</button>
+  </section>
+
+  <!-- 5. DESGLOSE -->
+  <section class="screen" id="screen-breakdown">
+    <span class="back-link" onclick="goTo('result')">‹ Volver al score</span>
+    <div class="kicker">Tu diagnóstico</div>
+    <h2 class="section-title">Lo que dicen tus respuestas</h2>
+    <div class="card" id="diagnosisCard" style="margin-top:16px;"></div>
+    <div class="kicker" style="margin-top:24px;">Desglose</div>
+    <h2 class="section-title">Qué subió y qué bajó tu score</h2>
+    <div class="card" id="breakdownList" style="margin-top:16px;"></div>
+    <button class="btn btn-primary" onclick="goTo('plan')">Ver mi plan de acción</button>
+  </section>
+
+  <!-- 6. PLAN DE ACCION -->
+  <section class="screen" id="screen-plan">
+    <div class="kicker">Tu plan</div>
+    <h2 class="section-title">Tu ruta de 90 días</h2>
+    <p class="section-body" id="planIntro" style="margin-bottom:14px;"></p>
+    <div class="plan-progress" id="planProgress"></div>
+    <div id="planPhases"></div>
+  </section>
+
+  <!-- 7. TROUBLESHOOTER -->
+  <section class="screen" id="screen-guide">
+    <div class="kicker">Resuelve tu duda</div>
+    <h2 class="section-title">Preguntas frecuentes por condición</h2>
+    <input class="search-box" id="guideSearch" placeholder="Busca por palabra clave, ej. tiroides" oninput="renderGuide()">
+    <div id="guideList"></div>
+  </section>
+
+  <!-- 8. BONOS HUB -->
+  <section class="screen" id="screen-bonos">
+    <div class="kicker">Bonos incluidos</div>
+    <h2 class="section-title">Tus 4 generadores personalizados</h2>
+    <div class="bonus-card" onclick="goTo('bonus-supp')">
+      <div class="bonus-icon">✚</div>
+      <div><div class="bonus-title">PlanSuplementos</div><div class="bonus-sub">Protocolo según tu score y condiciones</div></div>
+    </div>
+    <div class="bonus-card" onclick="goTo('bonus-preg')">
+      <div class="bonus-icon">?</div>
+      <div><div class="bonus-title">PreguntasMedico</div><div class="bonus-sub">Preguntas listas para tu próxima cita</div></div>
+    </div>
+    <div class="bonus-card" onclick="goTo('bonus-menu')">
+      <div class="bonus-icon">🌿</div>
+      <div><div class="bonus-title">MenúAntiInflamación</div><div class="bonus-sub">7 días adaptados a tu condición</div></div>
+    </div>
+    <div class="bonus-card" onclick="goTo('bonus-rutina')">
+      <div class="bonus-icon">☾</div>
+      <div><div class="bonus-title">RutinaFértil</div><div class="bonus-sub">Movimiento, sueño y manejo de estrés a tu medida</div></div>
+    </div>
+  </section>
+
+  <!-- 8a. BONO SUPLEMENTOS -->
+  <section class="screen" id="screen-bonus-supp">
+    <span class="back-link" onclick="goTo('bonos')">‹ Volver a bonos</span>
+    <div class="kicker">Bono 1</div>
+    <h2 class="section-title">Tu PlanSuplementos</h2>
+    <div class="tag-row" id="suppTags"></div>
+    <div class="card"><table class="gen-table" id="suppTable"></table></div>
+    <div class="card">
+      <div class="kicker">Tu enfoque nutricional</div>
+      <div id="dietIntro" class="section-body" style="margin-bottom:14px;"></div>
+      <div id="dietList"></div>
+    </div>
+    <div class="disclaimer">Esto no sustituye indicación médica. Confirma dosis con tu profesional de salud antes de iniciar cualquier suplemento o cambio importante de dieta.</div>
+  </section>
+
+  <!-- 8b. BONO PREGUNTAS -->
+  <section class="screen" id="screen-bonus-preg">
+    <span class="back-link" onclick="goTo('bonos')">‹ Volver a bonos</span>
+    <div class="kicker">Bono 2</div>
+    <h2 class="section-title">Preguntas para tu próxima cita</h2>
+    <div class="card" id="pregList"></div>
+    <button class="btn btn-ghost" onclick="window.print()">Imprimir esta lista</button>
+  </section>
+
+  <!-- 8c. BONO MENU -->
+  <section class="screen" id="screen-bonus-menu">
+    <span class="back-link" onclick="goTo('bonos')">‹ Volver a bonos</span>
+    <div class="kicker">Bono 3</div>
+    <h2 class="section-title">Tu MenúAntiInflamación de 7 días</h2>
+    <div class="tag-row" id="menuTags"></div>
+    <p class="section-body" id="menuIntro" style="margin-bottom:18px;"></p>
+    <div id="menuDays"></div>
+    <div class="card">
+      <div class="kicker">Lista de compras</div>
+      <div class="shop-list" id="shopList"></div>
+    </div>
+  </section>
+
+  <!-- 8d. BONO RUTINA -->
+  <section class="screen" id="screen-bonus-rutina">
+    <span class="back-link" onclick="goTo('bonos')">‹ Volver a bonos</span>
+    <div class="kicker">Bono 4</div>
+    <h2 class="section-title">Tu RutinaFértil diaria</h2>
+    <div class="tag-row" id="rutinaTags"></div>
+    <p class="section-body" id="rutinaIntro" style="margin-bottom:18px;"></p>
+    <div class="card">
+      <div class="kicker">Tu día, por bloques</div>
+      <div id="rutinaDia"></div>
+    </div>
+    <div class="card">
+      <div class="kicker">Movimiento de la semana</div>
+      <div id="rutinaMovimiento"></div>
+    </div>
+    <div class="card">
+      <div class="kicker">Manejo de estrés y sueño</div>
+      <div id="rutinaEstres"></div>
+    </div>
+    <div class="disclaimer">Estas rutinas son orientativas y no reemplazan indicación médica, sobre todo si tienes una condición diagnosticada que limite el ejercicio.</div>
+  </section>
+
+  <!-- 9. APRENDER -->
+  <section class="screen" id="screen-learn">
+    <div class="kicker">Biblioteca</div>
+    <h2 class="section-title">Aprende sobre tu ciclo</h2>
+    <div class="tabs" id="learnTabs"></div>
+    <div class="card" id="learnBody"></div>
+  </section>
+
+</div>
+
+<div class="bottom-nav" id="bottomNav" style="display:none;">
+  <button class="nav-item" data-nav="result" onclick="goTo('result')">Score</button>
+  <button class="nav-item" data-nav="plan" onclick="goTo('plan')">Plan</button>
+  <button class="nav-item" data-nav="guide" onclick="goTo('guide')">Guía</button>
+  <button class="nav-item" data-nav="bonos" onclick="goTo('bonos')">Bonos</button>
+  <button class="nav-item" data-nav="learn" onclick="goTo('learn')">Aprender</button>
+</div>
+
+<script>
+/* ============ STORAGE HELPERS ============ */
+async function saveState(){
+  try{
+    if(window.storage){
+      await window.storage.set('scoreovulacion_state', JSON.stringify({answers, planDone}), false);
+    }
+  }catch(e){ /* silent, non blocking */ }
+}
+async function loadState(){
+  try{
+    if(window.storage){
+      const r = await window.storage.get('scoreovulacion_state', false);
+      if(r && r.value){
+        const parsed = JSON.parse(r.value);
+        if(parsed.answers) Object.assign(answers, parsed.answers);
+        if(parsed.planDone) Object.assign(planDone, parsed.planDone);
+      }
+    }
+  }catch(e){ /* first run, no saved state */ }
+}
+
+/* ============ QUESTIONS ============ */
+const QUESTIONS = [
+  {id:'edad_mujer', module:'Edad y datos base', text:'¿Cuál es tu edad?', type:'number', min:25, max:55, placeholder:'Ej. 38'},
+  {id:'tiempo_buscando', module:'Edad y datos base', text:'¿Hace cuánto estás buscando embarazo?', type:'select', options:[
+    {v:'no_busca', l:'Aún no estoy buscando activamente'},
+    {v:'menos6', l:'Menos de 6 meses'},
+    {v:'6a12', l:'6 a 12 meses'},
+    {v:'mas12', l:'Más de 12 meses'}]},
+  {id:'tiene_pareja', module:'Edad y datos base', text:'¿Tienes una pareja masculina en este proceso?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No, o prefiero no incluir este dato'}]},
+  {id:'edad_pareja', module:'Edad y datos base', text:'¿Cuál es la edad de tu pareja?', type:'number', min:20, max:70, placeholder:'Ej. 41', showIf:a=>a.tiene_pareja==='si'},
+
+  {id:'regularidad_ciclo', module:'Ciclo menstrual', text:'¿Cómo describirías tu ciclo menstrual?', type:'select', options:[
+    {v:'regular', l:'Regular', sub:'entre 21 y 35 días'},
+    {v:'irregular_leve', l:'Irregular leve', sub:'varía algunos días cada mes'},
+    {v:'muy_irregular', l:'Muy irregular o ausente'}]},
+  {id:'dolor_severo', module:'Ciclo menstrual', text:'¿Tienes dolor menstrual severo que interfiere con tu día a día?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'}]},
+
+  {id:'embarazo_previo', module:'Historial reproductivo', text:'¿Has estado embarazada antes?', type:'select', options:[
+    {v:'natural', l:'Sí, de forma natural'},
+    {v:'tratamiento', l:'Sí, con ayuda de tratamiento'},
+    {v:'no', l:'No'}]},
+  {id:'perdidas_recurrentes', module:'Historial reproductivo', text:'¿Has tenido 2 o más pérdidas gestacionales?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'}]},
+  {id:'diagnostico_infertilidad', module:'Historial reproductivo', text:'¿Has recibido un diagnóstico de infertilidad?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'}]},
+
+  {id:'condiciones', module:'Condiciones médicas', text:'¿Tienes alguna de estas condiciones diagnosticadas?', type:'multiselect', options:[
+    {v:'pcos', l:'SOP / PCOS'},
+    {v:'endometriosis', l:'Endometriosis'},
+    {v:'miomas', l:'Miomas'},
+    {v:'tiroides', l:'Condición de tiroides'},
+    {v:'ninguna', l:'Ninguna'}]},
+  {id:'pcos_severidad', module:'Condiciones médicas', text:'¿Cómo calificaría tu médico tu SOP / PCOS?', type:'select', options:[
+    {v:'leve',l:'Leve'},{v:'moderada',l:'Moderada'},{v:'severa',l:'Severa'}], showIf:a=>a.condiciones && a.condiciones.includes('pcos')},
+  {id:'endo_severidad', module:'Condiciones médicas', text:'¿Cómo calificaría tu médico tu endometriosis?', type:'select', options:[
+    {v:'leve',l:'Leve'},{v:'moderada',l:'Moderada'},{v:'severa',l:'Severa'}], showIf:a=>a.condiciones && a.condiciones.includes('endometriosis')},
+  {id:'tiroides_controlada', module:'Condiciones médicas', text:'¿Tu condición de tiroides está tratada y controlada?', type:'select', options:[{v:'si',l:'Sí, tratada y controlada'},{v:'no',l:'No, o no lo sé con certeza'}], showIf:a=>a.condiciones && a.condiciones.includes('tiroides')},
+  {id:'cirugia_previa', module:'Condiciones médicas', text:'¿Has tenido alguna cirugía reproductiva previa?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'}]},
+
+  {id:'imc_rango', module:'Estilo de vida', text:'¿En qué rango describirías tu peso actual?', type:'select', options:[
+    {v:'bajo', l:'Bajo peso'},{v:'saludable', l:'Rango saludable'},{v:'sobrepeso', l:'Sobrepeso'},{v:'obesidad', l:'Obesidad'}]},
+  {id:'fuma', module:'Estilo de vida', text:'¿Fumas actualmente?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'}]},
+  {id:'alcohol', module:'Estilo de vida', text:'¿Cómo describirías tu consumo de alcohol?', type:'select', options:[{v:'nulo',l:'Nulo'},{v:'ocasional',l:'Ocasional'},{v:'frecuente',l:'Frecuente'}]},
+  {id:'ejercicio', module:'Estilo de vida', text:'¿Cuántas veces por semana haces ejercicio?', type:'select', options:[{v:'ninguno',l:'Ninguna'},{v:'1a2',l:'1 a 2 veces'},{v:'3mas',l:'3 veces o más'}]},
+  {id:'estres', module:'Estilo de vida', text:'¿Cómo describirías tu nivel de estrés en los últimos meses?', type:'select', options:[{v:'bajo',l:'Bajo'},{v:'medio',l:'Medio'},{v:'alto',l:'Alto'}]},
+  {id:'sueno', module:'Estilo de vida', text:'¿Cuántas horas duermes en promedio?', type:'select', options:[{v:'menos6',l:'Menos de 6 horas'},{v:'6a8',l:'6 a 8 horas'},{v:'mas8',l:'Más de 8 horas'}]},
+
+  {id:'pareja_fuma', module:'Factor masculino', text:'¿Tu pareja fuma?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'}], showIf:a=>a.tiene_pareja==='si'},
+  {id:'pareja_condicion', module:'Factor masculino', text:'¿Tu pareja tiene alguna condición de salud reproductiva reportada?', type:'select', options:[{v:'si',l:'Sí'},{v:'no',l:'No'},{v:'nose',l:'No lo sabe'}], showIf:a=>a.tiene_pareja==='si'},
+
+  {id:'hidratacion', module:'Hábitos adicionales', text:'¿Cuánta agua tomas en un día normal?', type:'select', options:[
+    {v:'poca', l:'Menos de 1 litro'},{v:'media', l:'1 a 2 litros'},{v:'buena', l:'Más de 2 litros'}]},
+  {id:'cafeina', module:'Hábitos adicionales', text:'¿Cuántas bebidas con cafeína tomas al día? (café, té negro, energizantes)', type:'select', options:[
+    {v:'ninguna', l:'Ninguna'},{v:'1a2', l:'1 a 2 al día'},{v:'3mas', l:'3 o más al día'}]},
+  {id:'toxicos_ambientales', module:'Hábitos adicionales', text:'¿Con qué frecuencia usas plásticos calentados (microondas) o productos de limpieza y cosmética convencionales?', type:'select', options:[
+    {v:'baja', l:'Rara vez, procuro evitarlos'},{v:'media', l:'A veces'},{v:'alta', l:'Todos los días, no lo había pensado'}]},
+  {id:'trabajo_tipo', module:'Hábitos adicionales', text:'¿Cómo es tu jornada laboral o de actividad diaria?', type:'select', options:[
+    {v:'sentada', l:'Mayormente sentada'},{v:'mixta', l:'Mixta, entre sentada y en movimiento'},{v:'activa', l:'Mayormente de pie o en movimiento'}]},
+  {id:'chequeos_medicos', module:'Hábitos adicionales', text:'¿Hace cuánto fue tu último chequeo ginecológico completo?', type:'select', options:[
+    {v:'reciente', l:'Hace menos de 1 año'},{v:'medio', l:'Hace 1 a 2 años'},{v:'lejano', l:'Hace más de 2 años o no recuerdo'}]}
+];
+
+const answers = {};
+const planDone = {};
+let currentQIndex = 0;
+
+/* ============ NAV ============ */
+function activeQuestions(){ return QUESTIONS.filter(q=>!q.showIf || q.showIf(answers)); }
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.getElementById('topbar').classList.toggle('hidden', id==='cover');
+  document.getElementById('qProgressLabel').textContent='';
+  const nav = document.getElementById('bottomNav');
+  const postQuiz = ['result','breakdown','plan','guide','bonos','bonus-supp','bonus-preg','bonus-menu','bonus-rutina','learn'];
+  nav.style.display = postQuiz.includes(id) ? 'flex' : 'none';
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const map = {result:'result',breakdown:'result',plan:'plan',guide:'guide',bonos:'bonos','bonus-supp':'bonos','bonus-preg':'bonos','bonus-menu':'bonos','bonus-rutina':'bonos',learn:'learn'};
+  if(map[id]) document.querySelector('[data-nav="'+map[id]+'"]')?.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='guide') renderGuide();
+  if(id==='bonos') {}
+  if(id==='bonus-supp') renderSupplements();
+  if(id==='bonus-preg') renderQuestions();
+  if(id==='bonus-menu') renderMenu();
+  if(id==='bonus-rutina') renderRoutine();
+  if(id==='learn') renderLearn();
+  if(id==='breakdown') renderBreakdown();
+  if(id==='plan') renderPlan();
+}
+
+function startQuiz(){
+  currentQIndex = 0;
+  goTo('quiz');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const list = activeQuestions();
+  if(currentQIndex >= list.length){ finishQuiz(); return; }
+  const q = list[currentQIndex];
+  document.getElementById('qProgressLabel').textContent = (currentQIndex+1)+' / '+list.length;
+  document.getElementById('quizProgressFill').style.width = Math.round((currentQIndex/list.length)*100)+'%';
+
+  let html = '<div class="q-module">'+q.module+'</div><div class="q-text">'+q.text+'</div>';
+
+  if(q.type==='select'){
+    html += '<div class="options">';
+    q.options.forEach(o=>{
+      const sel = answers[q.id]===o.v ? 'selected':'';
+      html += '<button class="opt '+sel+'" onclick="answerAndNext(\''+q.id+'\',\''+o.v+'\')">'+o.l + (o.sub?('<span class="opt-sub">'+o.sub+'</span>'):'') +'</button>';
+    });
+    html += '</div>';
+  } else if(q.type==='multiselect'){
+    html += '<div class="options" id="msWrap">';
+    q.options.forEach(o=>{
+      const current = answers[q.id]||[];
+      const sel = current.includes(o.v) ? 'selected':'';
+      html += '<button class="opt '+sel+'" data-v="'+o.v+'" onclick="toggleMulti(\''+q.id+'\',\''+o.v+'\',this)">'+o.l+'</button>';
+    });
+    html += '</div><div class="nav-btns"><button class="btn btn-primary" onclick="nextQuestion()">Continuar</button></div>';
+  } else if(q.type==='number'){
+    const val = answers[q.id]!==undefined ? answers[q.id] : '';
+    html += '<input class="num-input" type="number" id="numInput" min="'+q.min+'" max="'+q.max+'" placeholder="'+q.placeholder+'" value="'+val+'">';
+    html += '<div class="nav-btns"><button class="btn btn-primary" onclick="submitNumber(\''+q.id+'\','+q.min+','+q.max+')">Continuar</button></div>';
+    if(q.id==='edad_pareja') html += '<span class="skip-link" onclick="answerAndNext(\'edad_pareja\', null)">Prefiero no decirlo</span>';
+  }
+  if(currentQIndex>0){
+    html += '<span class="skip-link" onclick="prevQuestion()">‹ Pregunta anterior</span>';
+  }
+  document.getElementById('quizQuestion').innerHTML = html;
+}
+
+function answerAndNext(id, val){
+  answers[id] = val;
+  saveState();
+  nextQuestion();
+}
+function toggleMulti(id, val, btn){
+  if(!answers[id]) answers[id]=[];
+  const arr = answers[id];
+  const idx = arr.indexOf(val);
+  if(idx>-1){ arr.splice(idx,1); btn.classList.remove('selected'); }
+  else{
+    if(val==='ninguna'){ arr.length=0; arr.push('ninguna'); document.querySelectorAll('#msWrap .opt').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); }
+    else{
+      const noneIdx = arr.indexOf('ninguna');
+      if(noneIdx>-1){ arr.splice(noneIdx,1); document.querySelector('#msWrap .opt[data-v="ninguna"]')?.classList.remove('selected'); }
+      arr.push(val); btn.classList.add('selected');
+    }
+  }
+  saveState();
+}
+function submitNumber(id,min,max){
+  const v = parseFloat(document.getElementById('numInput').value);
+  if(isNaN(v) || v<min || v>max){ document.getElementById('numInput').style.borderColor='var(--red)'; return; }
+  answers[id]=v;
+  saveState();
+  nextQuestion();
+}
+function nextQuestion(){ currentQIndex++; renderQuestion(); }
+function prevQuestion(){ currentQIndex--; renderQuestion(); }
+
+function finishQuiz(){
+  goTo('loading');
+  setTimeout(()=>{ computeAndShowResult(); }, 1400);
+}
+
+/* ============ SCORING ENGINE ============ */
+function scoreEdad(a){
+  const e = a.edad_mujer;
+  if(e<30) return 30;
+  if(e<=34) return 26;
+  if(e<=37) return 20;
+  if(e<=40) return 14;
+  if(e<=42) return 8;
+  if(e<=44) return 4;
+  return 2;
+}
+function scoreCiclo(a){
+  if(a.regularidad_ciclo==='regular') return a.dolor_severo==='si' ? 7 : 10;
+  if(a.regularidad_ciclo==='irregular_leve') return 6;
+  return 2;
+}
+function scoreHistorial(a){
+  let p=7;
+  if(a.embarazo_previo==='natural') p+=3;
+  if(a.perdidas_recurrentes==='si') p-=4;
+  if(a.diagnostico_infertilidad==='si') p-=3;
+  return Math.max(1, Math.min(10,p));
+}
+function scoreCondiciones(a){
+  const cond = a.condiciones || [];
+  let deduct=0;
+  if(cond.includes('pcos')) deduct += {leve:3,moderada:6,severa:9}[a.pcos_severidad] || 3;
+  if(cond.includes('endometriosis')) deduct += {leve:3,moderada:7,severa:11}[a.endo_severidad] || 3;
+  if(cond.includes('miomas')) deduct += 5;
+  if(cond.includes('tiroides')) deduct += (a.tiroides_controlada==='si') ? 1 : 6;
+  if(a.cirugia_previa==='si') deduct += 2;
+  return Math.max(2, 20-deduct);
+}
+function scoreEstiloVida(a){
+  let p=0;
+  if(a.imc_rango==='saludable') p+=5;
+  if(a.fuma==='no') p+=3;
+  if(a.alcohol && a.alcohol!=='frecuente') p+=2;
+  if(a.ejercicio==='3mas') p+=2;
+  if(a.estres && a.estres!=='alto') p+=2;
+  if(a.sueno && a.sueno!=='menos6') p+=1;
+  return p;
+}
+function scoreFactorMasculino(a){
+  if(a.tiene_pareja!=='si' || a.edad_pareja===null || a.edad_pareja===undefined) return 6;
+  let base;
+  const e = a.edad_pareja;
+  if(e<35) base=10; else if(e<=44) base=7; else if(e<=50) base=4; else base=2;
+  if(a.pareja_fuma==='si') base-=2;
+  if(a.pareja_condicion==='si') base-=2;
+  return Math.max(1, base);
+}
+function scoreTiempo(a){
+  if(a.tiempo_buscando==='mas12') return 1;
+  if(a.tiempo_buscando==='6a12') return 3;
+  return 5;
+}
+
+const CATEGORY_META = [
+  {key:'edad', label:'Edad materna', max:30, fn:scoreEdad},
+  {key:'ciclo', label:'Regularidad del ciclo', max:10, fn:scoreCiclo},
+  {key:'historial', label:'Historial reproductivo', max:10, fn:scoreHistorial},
+  {key:'condiciones', label:'Condiciones médicas', max:20, fn:scoreCondiciones},
+  {key:'estilo', label:'Estilo de vida', max:15, fn:scoreEstiloVida},
+  {key:'masculino', label:'Factor masculino', max:10, fn:scoreFactorMasculino},
+  {key:'tiempo', label:'Tiempo intentando concebir', max:5, fn:scoreTiempo}
+];
+
+let lastResult = null;
+
+function computeScore(){
+  const cats = {};
+  let total=0;
+  CATEGORY_META.forEach(c=>{
+    const v = Math.max(0, Math.min(c.max, c.fn(answers)));
+    cats[c.key]=v;
+    total+=v;
+  });
+  total = Math.max(0, Math.min(100, total));
+  let zone, zoneColor, zoneLabel, zoneMsg;
+  if(total>=71){ zone='verde'; zoneColor='var(--green)'; zoneLabel='ZONA VERDE'; zoneMsg='Alta probabilidad de concepción natural. Tus factores están a tu favor.'; }
+  else if(total>=41){ zone='amarillo'; zoneColor='var(--amber)'; zoneLabel='ZONA AMARILLA'; zoneMsg='Probabilidad moderada. Hay factores que puedes optimizar de forma activa.'; }
+  else { zone='rojo'; zoneColor='var(--red)'; zoneLabel='ZONA ROJA'; zoneMsg='Probabilidad baja de concepción natural sin intervención. Es momento de una evaluación especializada.'; }
+
+  const REF = [
+    {min:0,max:34,avg:78},{min:35,max:37,avg:68},{min:38,max:40,avg:56},
+    {min:41,max:42,avg:44},{min:43,max:44,avg:34},{min:45,max:99,avg:24}
+  ];
+  const edad = answers.edad_mujer;
+  const ref = REF.find(r=>edad>=r.min && edad<=r.max) || REF[REF.length-1];
+
+  lastResult = {total, cats, zone, zoneColor, zoneLabel, zoneMsg, refAvg:ref.avg};
+  return lastResult;
+}
+
+function computeAndShowResult(){
+  const r = computeScore();
+  goTo('result');
+  document.getElementById('scoreNum').textContent = r.total;
+  const pill = document.getElementById('zonePill');
+  pill.textContent = r.zoneLabel;
+  pill.style.color = r.zoneColor;
+  document.getElementById('zoneMsg').textContent = r.zoneMsg;
+
+  const fill = document.getElementById('scoreTrackFill');
+  fill.style.width = '0%';
+  requestAnimationFrame(()=>{ setTimeout(()=>{ fill.style.width = r.total+'%'; }, 60); });
+
+  const diff = r.total - r.refAvg;
+  document.getElementById('compareFill').style.width = r.refAvg+'%';
+  document.getElementById('compareMarker').style.left = Math.min(97,r.total)+'%';
+  document.getElementById('compareNote').textContent = 'Tu score está ' + (diff>=0 ? (diff+' puntos por encima') : (Math.abs(diff)+' puntos por debajo')) + ' del promedio de tu grupo de edad (' + r.refAvg + '/100).';
+}
+
+function renderBreakdown(){
+  const r = lastResult || computeScore();
+  renderDiagnosis(r);
+  const colorFor = pct => pct>=0.71?'var(--green)':pct>=0.41?'var(--amber)':'var(--red)';
+  let html='';
+  CATEGORY_META.forEach(c=>{
+    const val = r.cats[c.key];
+    const pct = val/c.max;
+    html += '<div class="cat-row"><div class="cat-top"><span>'+c.label+'</span><span>'+val+' / '+c.max+'</span></div><div class="cat-bar"><div class="cat-fill" style="width:'+Math.round(pct*100)+'%;background:'+colorFor(pct)+'"></div></div></div>';
+  });
+  document.getElementById('breakdownList').innerHTML = html;
+}
+
+function renderDiagnosis(r){
+  const a = answers;
+  const weak = weakestCategories();
+  const strong = [...weak].reverse();
+  const catLabel = k => (CATEGORY_META.find(c=>c.key===k)||{}).label || k;
+  const cond = (a.condiciones||[]).filter(c=>c!=='ninguna').map(condName);
+
+  const p1Zone = {
+    verde:'Tu Índice de Fertilidad Real es de '+r.total+'/100, en zona verde. Tu perfil general está a tu favor para una concepción natural.',
+    amarillo:'Tu Índice de Fertilidad Real es de '+r.total+'/100, en zona amarilla. Tienes una probabilidad moderada, con varios factores que aún puedes optimizar de forma activa.',
+    rojo:'Tu Índice de Fertilidad Real es de '+r.total+'/100, en zona roja. Tu perfil actual sugiere que una evaluación especializada, además de los cambios que dependen de ti, es el paso más importante ahora.'
+  }[r.zone];
+
+  let p2 = 'Tu punto más fuerte es "'+catLabel(strong[0].key)+'", y donde tienes más margen de mejora es en "'+catLabel(weak[0].key)+'"'+(weak[1]?' y en "'+catLabel(weak[1].key)+'"':'')+'.';
+
+  const habitFlags = [];
+  if(a.hidratacion==='poca') habitFlags.push('tu hidratación diaria está por debajo de lo recomendado');
+  if(a.cafeina==='3mas') habitFlags.push('tu consumo de cafeína es alto');
+  if(a.toxicos_ambientales==='alta') habitFlags.push('tu exposición diaria a plásticos calentados o productos convencionales es alta');
+  if(a.trabajo_tipo==='sentada') habitFlags.push('tu jornada es mayormente sentada');
+  if(a.chequeos_medicos==='lejano') habitFlags.push('tu último chequeo ginecológico completo fue hace más de 2 años');
+  let p3 = habitFlags.length
+    ? 'En hábitos cotidianos, notamos que ' + habitFlags.join(', ') + '. Estos son factores de bajo costo y alto impacto que se trabajan en tu RutinaFértil (Bono 4).'
+    : 'Tus hábitos cotidianos de hidratación, cafeína, exposición ambiental y chequeos médicos están dentro de rangos favorables. Vale la pena sostenerlos.';
+
+  let p4 = cond.length
+    ? 'Reportaste ' + cond.join(', ') + ', lo cual ya está incorporado en tu PlanSuplementos, tu menú y tu plan de 90 días.'
+    : 'No reportaste condiciones médicas diagnosticadas, así que tu plan se enfoca en optimizar edad, ciclo, historial y estilo de vida.';
+
+  document.getElementById('diagnosisCard').innerHTML =
+    '<p class="section-body" style="margin-bottom:12px;">'+p1Zone+'</p>'+
+    '<p class="section-body" style="margin-bottom:12px;">'+p2+'</p>'+
+    '<p class="section-body" style="margin-bottom:12px;">'+p3+'</p>'+
+    '<p class="section-body">'+p4+'</p>';
+}
+
+/* ============ PLAN DE ACCION: RUTA DE 90 DÍAS ============ */
+function weakestCategories(){
+  const r = lastResult || computeScore();
+  return CATEGORY_META.map(c=>({key:c.key, pct:r.cats[c.key]/c.max})).sort((a,b)=>a.pct-b.pct);
+}
+
+function condName(c){
+  return {pcos:'SOP', endometriosis:'endometriosis', miomas:'miomas', tiroides:'tiroides'}[c] || c;
+}
+
+function weakLabTextFor(key){
+  const map = {
+    edad:'Aunque la edad no cambia, pide una evaluación de reserva ovárica (AMH) para tener un punto de partida claro, más allá del número de tu edad.',
+    ciclo:'Pide una evaluación hormonal básica (LH, FSH, estradiol) para entender qué está causando la irregularidad de tu ciclo.',
+    historial:'Comparte tu historial reproductivo completo, incluyendo pérdidas o diagnósticos previos, para que el seguimiento parta de tu caso real.',
+    condiciones:'Pide los estudios específicos de tu condición reportada: panel tiroideo completo, ecografía de miomas, o evaluación de severidad según corresponda.',
+    estilo:'No requiere un estudio médico, pero sí un plan concreto: pide que revisen contigo tus hábitos de sueño, estrés y alimentación en la próxima cita.',
+    masculino:'Sugiere a tu pareja un espermatograma. Es el estudio más directo para completar esta parte de la evaluación.',
+    tiempo:'Con el tiempo que llevas intentando, pide que prioricen los estudios de reserva ovárica y evaluación de trompas o cavidad uterina.'
+  };
+  return map[key] || 'Pide a tu médico que priorice los estudios relacionados con este factor en tu próxima cita.';
+}
+
+function styleTextFor(a){
+  const bits = [];
+  if(a.alcohol==='frecuente') bits.push('reduce el alcohol a máximo 1 vez por semana');
+  if(a.fuma==='si') bits.push('busca apoyo para dejar de fumar, es el cambio de mayor impacto disponible');
+  if(a.sueno==='menos6') bits.push('prioriza dormir entre 6 y 8 horas');
+  if(a.ejercicio!=='3mas') bits.push('suma una tercera sesión de ejercicio a la semana');
+  if(a.estres==='alto') bits.push('incorpora una práctica de manejo de estrés, aunque sean 10 minutos al día');
+  if(bits.length===0) bits.push('mantén los hábitos que ya tienes, están sumando a tu favor');
+  return 'En estos 30 días: ' + bits.join(', ') + '.';
+}
+
+function buildPlan90(){
+  const r = lastResult || computeScore();
+  const weak = weakestCategories();
+  const weakKeys = weak.slice(0,2).map(w=>w.key);
+  const catLabel = k => (CATEGORY_META.find(c=>c.key===k)||{}).label || k;
+  const cond = (answers.condiciones || []).filter(c=>c!=='ninguna');
+  const hasPareja = answers.tiene_pareja==='si';
+
+  const phase1 = [];
+  const phase2 = [];
+  const phase3 = [];
+
+  if(r.zone==='rojo'){
+    phase1.push({title:'Agenda cita con especialista en fertilidad esta semana', body:'Con tu score en zona roja ('+r.total+'/100), el paso de mayor impacto en estos primeros 30 días es tener una evaluación profesional que confirme tu punto de partida real.'});
+  }
+  if(answers.tiempo_buscando==='mas12'){
+    phase1.push({title:'Solicita evaluación de fertilidad para ambos', body:'Llevas más de 12 meses intentando. La guía general recomienda evaluar a ambos miembros de la pareja en este punto, no solo a ti.'});
+  }
+  phase1.push({title:'Pide los estudios de tu categoría más débil: '+catLabel(weakKeys[0]), body:weakLabTextFor(weakKeys[0])});
+  if(cond.length){
+    phase1.push({title:'Confirma el estado actual de tu condición reportada', body:'Lleva tus resultados previos de '+cond.map(condName).join(', ')+' a tu próxima cita para que el plan se ajuste a datos actuales, no solo al diagnóstico original.'});
+  }
+  phase1.push({title:'Empieza tu PlanSuplementos y tu enfoque nutricional', body:'Inicia el protocolo del Bono 1, generado según tu score y tus condiciones. Los primeros 30 días son la ventana donde estos cambios empiezan a notarse.'});
+  phase1.push({title:'Adopta tu RutinaFértil diaria', body:'Incorpora los bloques de tu Bono 4: hidratación, movimiento y manejo de estrés, ajustados a tus hábitos actuales de sueño, cafeína y jornada laboral.'});
+  phase1.push({title:'Registra tu ciclo desde hoy', body:'Aunque tu ciclo sea regular, tener el registro desde el día 1 te da datos reales para el resto del plan.'});
+
+  phase2.push({title:'Profundiza los cambios de estilo de vida', body: styleTextFor(answers)});
+  if(hasPareja){
+    phase2.push({title:'Confirma el resultado del espermatograma de tu pareja', body:'Si aún no se ha hecho, este es el momento límite para tenerlo antes de la revisión de mitad de plan.'});
+  }
+  if(weakKeys.includes('condiciones') || cond.length){
+    phase2.push({title:'Revisa la evolución de tu condición con tu médico', body:'A los 30 a 60 días de ajuste, confirma si tu '+ (cond[0]?condName(cond[0]):'condición') +' responde a los cambios o si necesitas escalar el tratamiento.'});
+  }
+  phase2.push({title:'Sostén el protocolo de suplementos y dieta', body:'La consistencia entre el día 30 y 60 es lo que determina si estos cambios impactan tu siguiente ciclo.'});
+  phase2.push({title:'Revisa tu registro de ciclo acumulado', body:'A los 60 días ya tienes suficientes datos de ciclo para identificar patrones reales de tu ventana fértil.'});
+
+  phase3.push({title:'Vuelve a hacer el test ScoreOvulación', body:'Compara tu score actual contra el de hoy ('+r.total+'/100) para ver qué categorías mejoraron con el plan.'});
+  phase3.push({title:'Agenda una cita de seguimiento', body:'Usa el generador PreguntasMedico del Bono 2 para llegar con las preguntas correctas a esta revisión de los 90 días.'});
+  if(r.zone==='verde'){
+    phase3.push({title:'Sigue intentando de forma natural con seguimiento', body:'Con tu score en zona verde, el siguiente punto de revisión natural es a los 6 a 12 meses si aún no hay embarazo.'});
+  } else if(r.zone==='amarillo'){
+    phase3.push({title:'Decide si continúas o escalas a especialista', body:'Si tu score no mejoró de zona amarilla a verde en estos 90 días, es razonable considerar una evaluación con especialista en fertilidad.'});
+  } else {
+    phase3.push({title:'Define con tu médico el siguiente paso del tratamiento', body:'Con tu score en zona roja, a los 90 días ya deberías tener un plan médico claro más allá de los cambios de estilo de vida.'});
+  }
+
+  return [
+    {id:'p1', label:'DÍAS 1–30', title: r.zone==='rojo' ? 'Diagnóstico inmediato' : r.zone==='amarillo' ? 'Diagnóstico y primeros ajustes' : 'Afinar tu ventana fértil', items: phase1},
+    {id:'p2', label:'DÍAS 31–60', title:'Optimización activa', items: phase2},
+    {id:'p3', label:'DÍAS 61–90', title:'Evaluación y siguiente paso', items: phase3}
+  ];
+}
+
+function renderPlan(){
+  const r = lastResult || computeScore();
+  const introByZone = {
+    verde:'Tu score de '+r.total+'/100 está en zona verde. Este plan de 90 días está pensado para afinar tu ventana fértil y mantener lo que ya te está funcionando.',
+    amarillo:'Tu score de '+r.total+'/100 está en zona amarilla. Este plan de 90 días prioriza los factores con más margen de mejora en tu resultado.',
+    rojo:'Tu score de '+r.total+'/100 está en zona roja. Este plan de 90 días combina evaluación médica pronta con los cambios que sí dependen de ti.'
+  };
+  document.getElementById('planIntro').textContent = introByZone[r.zone];
+
+  const phases = buildPlan90();
+  let totalItems=0, doneItems=0;
+  let html='';
+  phases.forEach(phase=>{
+    html += '<div class="phase-block"><div class="phase-block-head"><span class="phase-badge">'+phase.label+'</span><span class="phase-title">'+phase.title+'</span></div>';
+    phase.items.forEach((it,i)=>{
+      const stepId = phase.id+'-'+i;
+      const done = planDone[stepId];
+      totalItems++; if(done) doneItems++;
+      html += '<div class="step-card '+(done?'done':'')+'" onclick="togglePlanStep(\''+stepId+'\')"><div class="step-check '+(done?'checked':'')+'"></div><div><div class="step-title">'+it.title+'</div><div class="step-body">'+it.body+'</div></div></div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('planPhases').innerHTML = html;
+  document.getElementById('planProgress').textContent = doneItems+' de '+totalItems+' acciones completadas';
+}
+function togglePlanStep(stepId){
+  planDone[stepId] = !planDone[stepId];
+  saveState();
+  renderPlan();
+}
+
+/* ============ TROUBLESHOOTER ============ */
+const GUIDE_ITEMS = [
+  {q:'Tengo SOP / PCOS y no sé si eso significa que no puedo quedar embarazada de forma natural', a:'El SOP afecta la ovulación, no la elimina. Muchas mujeres con SOP ovulan de forma irregular pero sí ovulan. Regular el ciclo con hábitos y, si es necesario, tratamiento médico, mejora tus probabilidades reales.', kw:'sop pcos ovarios poliquisticos'},
+  {q:'Mi médico me dijo que tengo baja reserva ovárica, ¿qué significa eso realmente?', a:'La reserva ovárica es la cantidad de óvulos disponibles, no su calidad. Una reserva baja reduce la ventana de tiempo, pero no significa cero probabilidad. La calidad del óvulo se evalúa aparte.', kw:'reserva ovarica amh baja'},
+  {q:'Tengo miomas, ¿afecta esto mi capacidad de quedar embarazada?', a:'Depende de su tamaño y ubicación. Los miomas que no distorsionan la cavidad uterina suelen tener bajo impacto. Los que sí la distorsionan pueden dificultar la implantación. Un ultrasonido lo confirma.', kw:'miomas fibromas utero'},
+  {q:'Mi tiroides está descontrolada, ¿puede eso ser la causa de que no logro embarazarme?', a:'Sí. La tiroides regula el ciclo ovulatorio. Una tiroides no tratada, alta o baja, puede alterar la ovulación por completo. Es de los factores más fáciles de corregir una vez detectado.', kw:'tiroides tsh hipotiroidismo'},
+  {q:'Tengo endometriosis, ¿cuáles son mis probabilidades reales?', a:'Varían mucho según el grado. La endometriosis leve tiene un impacto menor en la fertilidad natural. Los grados moderados y severos sí reducen las probabilidades y suelen requerir evaluación especializada.', kw:'endometriosis dolor pelvico'},
+  {q:'Llevo más de un año intentando y no pasa nada, ¿cuándo debo preocuparme de verdad?', a:'Después de 12 meses de intentos sin éxito (o 6 meses si tienes 35 años o más) es momento de una evaluación de fertilidad para ambos, no solo para ti.', kw:'tiempo intentando no logro'},
+  {q:'Mi pareja tiene más de 45 años, ¿afecta eso tanto como mi edad?', a:'La edad paterna sí influye, aunque de forma distinta. Después de los 45 aumenta el tiempo hasta el embarazo y ciertos riesgos genéticos. Un espermatograma da información concreta.', kw:'pareja edad masculina esperma'}
+];
+function renderGuide(){
+  const term = (document.getElementById('guideSearch')?.value||'').toLowerCase();
+  const items = GUIDE_ITEMS.filter(it=> !term || it.q.toLowerCase().includes(term) || it.kw.includes(term));
+  let html='';
+  items.forEach((it,i)=>{
+    html += '<div class="acc-item" id="acc-'+i+'"><div class="acc-head" onclick="toggleAcc('+i+')"><span>'+it.q+'</span><span class="acc-icon">+</span></div><div class="acc-body"><div class="acc-body-inner">'+it.a+'</div></div></div>';
+  });
+  document.getElementById('guideList').innerHTML = html || '<p class="section-body">No encontramos resultados para esa búsqueda.</p>';
+}
+function toggleAcc(i){ document.getElementById('acc-'+i).classList.toggle('open'); }
+
+/* ============ BONO 1: SUPLEMENTOS + DIETA PERSONALIZADA ============ */
+function renderSupplements(){
+  const cond = answers.condiciones || [];
+  const edad = answers.edad_mujer || 35;
+  const r = lastResult || computeScore();
+  const weak = weakestCategories();
+  const weakKey = weak[0].key;
+  const tags = [];
+  if(cond.includes('pcos')) tags.push('SOP / PCOS');
+  if(cond.includes('endometriosis')) tags.push('Endometriosis');
+  if(cond.includes('miomas')) tags.push('Miomas');
+  if(cond.includes('tiroides')) tags.push('Tiroides');
+  if(edad>=35) tags.push('35+');
+  tags.push(r.zoneLabel);
+  document.getElementById('suppTags').innerHTML = tags.map(t=>'<span class="chip">'+t+'</span>').join('');
+
+  const rows = [['Ácido fólico metilado','Siempre','400 a 800 mcg','Diario, con el desayuno']];
+  if(edad>=35) rows.push(['CoQ10','Edad 35 años o más','200 a 400 mg','Diario, con una comida con grasa']);
+  const stress = answers.estres;
+  if(stress==='alto' || answers.imc_rango==='sobrepeso' || answers.imc_rango==='obesidad') rows.push(['Omega-3','Estilo de vida con margen de mejora','1000 a 2000 mg','Diario, con la comida principal']);
+  if(cond.includes('pcos')) rows.push(['Mio-inositol','SOP / PCOS reportado','2 a 4 g','Dividido en 2 tomas al día']);
+  if(cond.includes('tiroides') && answers.tiroides_controlada!=='si') rows.push(['Selenio','Tiroides sin control reportado','100 a 200 mcg','Diario, con el almuerzo']);
+  if(edad>=40 || r.zone==='rojo') rows.push(['DHEA','Baja reserva probable o edad 40+','Solo bajo supervisión médica','No autoadministrar sin control']);
+
+  let html = '<tr><th>Suplemento</th><th>Por qué</th><th>Dosis</th><th>Timing</th></tr>';
+  rows.forEach(row=>{ html += '<tr><td><strong>'+row[0]+'</strong></td><td>'+row[1]+'</td><td>'+row[2]+'</td><td>'+row[3]+'</td></tr>'; });
+  document.getElementById('suppTable').innerHTML = html;
+
+  /* --- Dieta personalizada --- */
+  const introByZone = {
+    verde:'Tu score de '+r.total+'/100 está en zona verde. Tu enfoque nutricional aquí es de mantenimiento: sostener lo que ya te está funcionando.',
+    amarillo:'Tu score de '+r.total+'/100 está en zona amarilla. La alimentación es una de las palancas más rápidas para mover tu score en los próximos 90 días.',
+    rojo:'Tu score de '+r.total+'/100 está en zona roja. Los cambios de alimentación no reemplazan la evaluación médica, pero sí pueden apoyar el resto del proceso.'
+  };
+  document.getElementById('dietIntro').textContent = introByZone[r.zone];
+
+  const diet = [];
+  if(cond.includes('pcos')) diet.push({t:'Prioriza bajo índice glicémico', b:'Con SOP reportado, cambia harinas y azúcares refinados por granos enteros, legumbres y vegetales. Esto ayuda a estabilizar la insulina, uno de los factores que más afecta la ovulación en SOP.'});
+  if(cond.includes('endometriosis')) diet.push({t:'Reduce alimentos proinflamatorios', b:'Con endometriosis reportada, disminuye fritos, embutidos y azúcar añadida. Aumenta pescados grasos, aceite de oliva y vegetales de hoja verde, que ayudan a bajar la inflamación pélvica.'});
+  if(cond.includes('miomas')) diet.push({t:'Modera lácteos y carnes rojas procesadas', b:'Con miomas reportados, prioriza vegetales crucíferos cocidos, legumbres y fibra, que apoyan la eliminación de exceso de estrógeno.'});
+  if(cond.includes('tiroides')) diet.push({t:'Incluye selenio y zinc todos los días', b:'Con tu condición de tiroides, agrega nueces de Brasil, mariscos, huevo y semillas de calabaza. Evita el exceso de crucíferas crudas en una sola comida.'});
+  if(answers.imc_rango==='sobrepeso' || answers.imc_rango==='obesidad') diet.push({t:'Ajusta el tamaño de las porciones con calma', b:'Un cambio del 5 al 10% en el peso corporal puede mejorar la regularidad ovulatoria. No se trata de dietas extremas, sino de constancia.'});
+  if(answers.imc_rango==='bajo') diet.push({t:'Aumenta la densidad calórica de tus comidas', b:'El bajo peso también puede alterar la ovulación. Prioriza frutos secos, aguacate, aceite de oliva y proteína en cada comida.'});
+  if(edad>=35) diet.push({t:'Suma antioxidantes a diario', b:'Berries, nueces, chocolate oscuro y vegetales de color intenso ayudan a proteger la calidad ovular frente al paso del tiempo.'});
+  if(weakKey==='estilo') diet.push({t:'Esta es tu categoría más débil del test', b:'Tu estilo de vida fue el factor con más margen de mejora en tu resultado. Los cambios de alimentación de esta lista son la palanca más directa que tienes disponible ahora mismo.'});
+  if(diet.length===0) diet.push({t:'Sostén una base antiinflamatoria general', b:'Vegetales de hoja verde, pescado, legumbres y grasas saludables como aceite de oliva y aguacate son la base recomendada para tu perfil.'});
+
+  document.getElementById('dietList').innerHTML = diet.map(d=>'<div class="diet-item"><div class="diet-dot"></div><div><div class="diet-title">'+d.t+'</div><div class="diet-body">'+d.b+'</div></div></div>').join('');
+}
+
+/* ============ BONO 2: PREGUNTAS CON RESPUESTA PERSONALIZADA ============ */
+function renderQuestions(){
+  const cond = answers.condiciones || [];
+  const r = lastResult || computeScore();
+  const edad = answers.edad_mujer;
+  const weak = weakestCategories();
+  const weakLabel = (CATEGORY_META.find(c=>c.key===weak[0].key)||{}).label || 'tu categoría más débil';
+  const zoneWord = r.zone==='verde' ? 'favorable' : r.zone==='amarillo' ? 'moderado' : 'que requiere atención pronta';
+
+  const qa = [];
+  qa.push({
+    q:'¿Qué estudios recomienda para confirmar mi reserva ovárica actual?',
+    a:'Con '+edad+' años y un score de '+r.total+'/100 (zona '+r.zone+'), lo más informativo es pedir una prueba de AMH y un conteo de folículos antrales por ecografía. Eso te da una foto real, más allá de lo que indica solo tu edad.'
+  });
+  qa.push({
+    q:'Según mi historial, ¿qué cambios de estilo de vida tendrían más impacto en mi caso?',
+    a:'En tu test, "'+weakLabel+'" fue la categoría con más margen de mejora. Pregúntale a tu médico directamente cuánto podría moverse tu probabilidad si trabajas ese factor en los próximos 90 días.'
+  });
+  if(cond.includes('tiroides')){
+    const estado = answers.tiroides_controlada==='si' ? 'ya está tratada y controlada' : 'no está controlada actualmente';
+    qa.push({q:'¿Mis niveles de TSH están dentro del rango óptimo para fertilidad?', a:'Como tu tiroides '+estado+', pide que revisen tu TSH contra el rango específico para fertilidad, que suele ser más estricto que el rango general de laboratorio.'});
+  }
+  if(cond.includes('pcos')){
+    const sev = answers.pcos_severidad || 'reportado';
+    qa.push({q:'¿Qué protocolo recomienda para regular mi ciclo dado mi SOP?', a:'Con un SOP calificado como '+sev+', pregunta si conviene empezar por inositol y ajustes de alimentación antes de considerar inducción de ovulación con medicamento.'});
+  }
+  if(cond.includes('endometriosis')){
+    const sev = answers.endo_severidad || 'reportada';
+    qa.push({q:'¿Mi grado de endometriosis requiere evaluación especializada ya?', a:'Con endometriosis '+sev+', esta es una pregunta que vale la pena hacer de forma directa: los grados moderados y severos suelen beneficiarse de una evaluación con especialista en fertilidad, no solo ginecología general.'});
+  }
+  if(cond.includes('miomas')){
+    qa.push({q:'¿Mis miomas distorsionan la cavidad uterina?', a:'Esto determina casi todo el impacto real de tus miomas en la implantación. Pide que te lo confirmen con una ecografía o histerosonografía si aún no te lo han dicho con claridad.'});
+  }
+  if(answers.tiempo_buscando==='mas12'){
+    qa.push({q:'¿En qué momento deberíamos considerar una evaluación de fertilidad para ambos?', a:'Llevas más de 12 meses intentando, así que este ya es el momento. La guía general es evaluar a ambos miembros de la pareja después de 12 meses (o 6 si tienes 35 años o más), y tú ya cumples ese criterio.'});
+  }
+  if(answers.tiene_pareja==='si'){
+    qa.push({q:'¿Recomienda un espermatograma como parte de esta evaluación?', a:'Con la edad de tu pareja reportada, un espermatograma es una prueba simple y rápida que completa el diagnóstico de la pareja y evita que todo el peso de la evaluación caiga solo en ti.'});
+  }
+  qa.push({
+    q:'¿Qué exámenes o pasos priorizar en los próximos 30 días?',
+    a: r.zone==='rojo'
+      ? 'Con tu score en zona roja, prioriza agendar cita con un especialista en fertilidad esta misma semana, además de los estudios de reserva ovárica.'
+      : r.zone==='amarillo'
+      ? 'Con tu score en zona amarilla, agenda los estudios de reserva ovárica y de tu categoría más débil ("'+weakLabel+'") dentro del próximo mes.'
+      : 'Con tu score en zona verde, un chequeo de rutina en los próximos meses es suficiente para confirmar que todo sigue alineado.'
+  });
+  qa.push({
+    q:'¿Qué señales indicarían que debemos acelerar el proceso hacia un especialista?',
+    a:'Dado tu panorama '+zoneWord+', las señales a vigilar son: ciclos que se vuelven más irregulares, dolor pélvico nuevo o creciente, o que pasen 3 meses más sin resultados después de aplicar tu plan de acción.'
+  });
+
+  document.getElementById('pregList').innerHTML = qa.map((item,i)=>
+    '<div class="qa-block"><div class="qa-q">'+(i+1)+'. '+item.q+'</div><div class="qa-a"><strong>Para tu caso:</strong> '+item.a+'</div></div>'
+  ).join('');
+}
+
+/* ============ BONO 3: MENU ============ */
+function renderMenu(){
+  const cond = answers.condiciones || [];
+  const r = lastResult || computeScore();
+  const tags = [];
+  if(cond.includes('pcos')) tags.push('Bajo índice glicémico');
+  if(cond.includes('tiroides')) tags.push('Selenio y zinc');
+  if(cond.includes('miomas')) tags.push('Bajo en lácteos');
+  if(cond.includes('endometriosis')) tags.push('Antiinflamatorio reforzado');
+  if(tags.length===0) tags.push('Antiinflamatorio general');
+  document.getElementById('menuTags').innerHTML = tags.map(t=>'<span class="chip">'+t+'</span>').join('');
+
+  const condNames = {pcos:'SOP', endometriosis:'endometriosis', miomas:'miomas', tiroides:'tiroides'}
+  const reported = cond.filter(c=>c!=='ninguna').map(c=>condNames[c]);
+  document.getElementById('menuIntro').textContent = reported.length
+    ? 'Este menú está adaptado a lo que reportaste en el test (' + reported.join(', ') + '), pensado para acompañar tu score actual de ' + r.total + '/100.'
+    : 'No reportaste ninguna condición específica, así que este menú sigue una base antiinflamatoria general pensada para acompañar tu score actual de ' + r.total + '/100.';
+
+  const base = [
+    ['Avena con frutos rojos y semillas de chía','Ensalada de quinoa, garbanzos y vegetales de hoja verde','Salmón al horno con vegetales asados','Nueces y una fruta'],
+    ['Batido de espinaca, plátano y proteína vegetal','Pollo a la plancha con camote y brócoli','Sopa de lentejas con vegetales','Yogur natural con semillas de linaza'],
+    ['Huevos revueltos con palta y tomate','Bowl de arroz integral, atún y vegetales','Pescado blanco con puré de coliflor','Zanahorias baby con hummus'],
+    ['Yogur natural con granola sin azúcar y berries','Ensalada de lentejas con vegetales de hoja verde','Pollo al horno con quinoa y espárragos','Manzana con mantequilla de almendra'],
+    ['Tostadas de pan integral con palta y huevo','Salmón con ensalada de vegetales mixtos','Estofado de vegetales con garbanzos','Frutos secos mixtos'],
+    ['Smoothie verde con espinaca, jengibre y piña','Bowl de quinoa con vegetales de hoja verde y semillas','Pechuga de pavo con vegetales al vapor','Zanahorias con hummus'],
+    ['Panqueques de avena y plátano','Ensalada de garbanzos, pepino y tomate','Pescado al horno con vegetales de temporada','Té de jengibre con nueces']
+  ];
+  let html='';
+  base.forEach((d,i)=>{
+    html += '<div class="day-block"><div class="day-title">Día '+(i+1)+'</div><div class="meal-row">Desayuno: '+d[0]+'</div><div class="meal-row">Almuerzo: '+d[1]+'</div><div class="meal-row">Cena: '+d[2]+'</div><div class="meal-row">Snack: '+d[3]+'</div></div>';
+  });
+  document.getElementById('menuDays').innerHTML = html;
+
+  const shop = ['Avena','Frutos rojos','Semillas de chía','Espinaca','Plátano','Quinoa','Garbanzos','Vegetales de hoja verde','Salmón','Pollo','Camote','Brócoli','Lentejas','Huevos','Palta','Tomate','Arroz integral','Atún','Pescado blanco','Coliflor','Yogur natural','Granola sin azúcar','Pan integral','Semillas de linaza','Espárragos','Jengibre','Piña','Pepino','Pavo','Nueces y frutos secos','Zanahorias','Hummus'];
+  document.getElementById('shopList').innerHTML = shop.map(s=>'<div>· '+s+'</div>').join('');
+}
+
+/* ============ BONO 4: RUTINAFÉRTIL ============ */
+function renderRoutine(){
+  const a = answers;
+  const r = lastResult || computeScore();
+  const cond = (a.condiciones||[]).filter(c=>c!=='ninguna');
+  const weak = weakestCategories();
+  const weakKey = weak[0].key;
+
+  const tags = [];
+  if(a.ejercicio==='ninguno') tags.push('Activación gradual');
+  if(a.estres==='alto') tags.push('Prioridad: estrés');
+  if(a.sueno==='menos6') tags.push('Prioridad: sueño');
+  if(cond.includes('endometriosis')) tags.push('Bajo impacto');
+  if(cond.includes('pcos')) tags.push('Sensibilidad a la insulina');
+  if(tags.length===0) tags.push('Mantenimiento');
+  document.getElementById('rutinaTags').innerHTML = tags.map(t=>'<span class="chip">'+t+'</span>').join('');
+
+  document.getElementById('rutinaIntro').textContent = 'Esta rutina se ajusta a tu resultado de '+r.total+'/100 y a lo que reportaste sobre tus hábitos. No busca sumar más carga a tu día, busca sostener lo esencial.';
+
+  /* Bloques del día */
+  const dayBlocks = [];
+  dayBlocks.push({tag:'MAÑANA', title:'Hidratación al despertar', body: a.hidratacion==='poca'
+    ? 'Empieza con un vaso grande de agua antes del café. Tu ingesta diaria está por debajo de lo recomendado, este es el ajuste de mayor impacto y menor esfuerzo.'
+    : 'Sostén tu vaso de agua al despertar antes del café o té, ya vienes bien encaminada en este hábito.'});
+  if(a.cafeina==='3mas'){
+    dayBlocks.push({tag:'MAÑANA', title:'Reduce una taza de cafeína', body:'Reportaste 3 o más bebidas con cafeína al día. Baja a 2 como máximo, priorizando la de la mañana y cambiando las de la tarde por infusiones sin cafeína.'});
+  }
+  dayBlocks.push({tag:'MEDIODÍA', title:'Pausa activa de 5 minutos', body: a.trabajo_tipo==='sentada'
+    ? 'Con una jornada mayormente sentada, levántate a caminar 5 minutos cada 90 minutos. Es más efectivo para tu circulación que una sola caminata larga al día.'
+    : 'Aprovecha tu movimiento natural del día, solo asegúrate de tener una pausa consciente sin pantallas al mediodía.'});
+  dayBlocks.push({tag:'TARDE', title:'Comida principal sin pantallas', body:'Comer sin distracciones mejora la digestión y baja el estrés asociado a las comidas. Un cambio simple con efecto real sobre tu nivel de cortisol.'});
+  dayBlocks.push({tag:'NOCHE', title:'Corte de pantallas 45 minutos antes de dormir', body: a.sueno==='menos6'
+    ? 'Reportaste menos de 6 horas de sueño. Este es tu punto de mayor impacto: la luz de pantallas retrasa la melatonina, la hormona que regula tu ciclo junto con las reproductivas.'
+    : 'Sostén tu rutina actual de sueño, ya estás en un rango favorable.'});
+  if(a.toxicos_ambientales==='alta'){
+    dayBlocks.push({tag:'NOCHE', title:'Cambia un producto a la vez', body:'Reportaste uso diario de plásticos calentados o productos convencionales. No necesitas cambiar todo de golpe: empieza por no calentar comida en plástico esta semana.'});
+  }
+  document.getElementById('rutinaDia').innerHTML = dayBlocks.map(b=>'<div class="block-row"><div class="block-tag">'+b.tag+'</div><div><div class="block-title">'+b.title+'</div><div class="block-body">'+b.body+'</div></div></div>').join('');
+
+  /* Movimiento de la semana */
+  const move = [];
+  if(cond.includes('endometriosis') || cond.includes('miomas')){
+    move.push({title:'3 sesiones de movimiento suave', body:'Camina, nada o haz yoga suave 3 veces por semana, 25 a 30 minutos. Evita el entrenamiento de alto impacto sin indicación médica, dado lo reportado.'});
+  } else if(a.ejercicio==='ninguno'){
+    move.push({title:'Empieza con 2 caminatas de 20 minutos', body:'Partir de cero está bien. Dos caminatas esta semana son mejores que un plan ambicioso que no sostienes. Suma una tercera la próxima semana.'});
+  } else if(cond.includes('pcos')){
+    move.push({title:'Combina fuerza y caminata', body:'Con SOP reportado, el entrenamiento de fuerza 2 veces por semana ayuda a la sensibilidad a la insulina, junto con 2 caminatas de 30 minutos.'});
+  } else {
+    move.push({title:'Sostén tus 3 sesiones semanales', body:'Ya reportaste una frecuencia de ejercicio favorable. El objetivo esta semana es simplemente mantenerla.'});
+  }
+  move.push({title:'Evita el sedentarismo prolongado', body: a.trabajo_tipo==='sentada' ? 'Levántate al menos una vez por hora durante tu jornada de trabajo.' : 'Tu jornada ya tiene movimiento, cuida solo no encadenar más de 2 horas sentada seguidas.'});
+  document.getElementById('rutinaMovimiento').innerHTML = move.map(m=>'<div class="diet-item"><div class="diet-dot"></div><div><div class="diet-title">'+m.title+'</div><div class="diet-body">'+m.body+'</div></div></div>').join('');
+
+  /* Estrés y sueño */
+  const stress = [];
+  if(a.estres==='alto'){
+    stress.push({title:'10 minutos de respiración o meditación guiada', body:'Reportaste estrés alto, uno de los factores que más interfiere con la regularidad hormonal. Elige un horario fijo del día para sostenerlo, de preferencia en la mañana.'});
+  } else if(a.estres==='medio'){
+    stress.push({title:'Un espacio de desconexión diario', body:'15 minutos sin trabajo ni pantallas, en lo que sea que te relaje, ayudan a que el estrés medio no escale.'});
+  } else {
+    stress.push({title:'Sostén tus prácticas actuales de manejo de estrés', body:'Tu nivel de estrés reportado es bajo, sigue haciendo lo que ya te funciona.'});
+  }
+  if(a.sueno!=='mas8' ){
+    stress.push({title:'Horario fijo para dormir y despertar', body:'Aunque varíe la hora exacta, mantener el mismo horario todos los días, incluidos fines de semana, mejora la calidad del sueño más que dormir más horas de forma irregular.'});
+  }
+  if(weakKey==='ciclo'){
+    stress.push({title:'Registra tu temperatura basal', body:'Dado que tu ciclo fue tu categoría más débil, registrar tu temperatura basal al despertar te da información directa sobre si estás ovulando.'});
+  }
+  document.getElementById('rutinaEstres').innerHTML = stress.map(s=>'<div class="diet-item"><div class="diet-dot"></div><div><div class="diet-title">'+s.title+'</div><div class="diet-body">'+s.body+'</div></div></div>').join('');
+}
+
+/* ============ APRENDER ============ */
+const LEARN_TABS = [
+  {id:'reserva', label:'Reserva vs. calidad', body:'La reserva ovárica es cuántos óvulos te quedan. La calidad del óvulo es qué tan sanos están genéticamente. Son dos cosas distintas y suelen confundirse. Puedes tener buena reserva con óvulos de menor calidad, o reserva baja con óvulos de buena calidad.'},
+  {id:'edad', label:'Qué mide la edad', body:'La edad es un indicador aproximado, no una sentencia. Funciona como proxy de la reserva y la calidad ovárica en promedio, pero cada cuerpo es distinto. Por eso este test combina la edad con otros 6 factores.'},
+  {id:'masculino', label:'Factor masculino', body:'La edad y la salud del hombre influyen tanto como se suele pensar que solo influye la mujer. Después de los 45, el tiempo hasta el embarazo tiende a aumentar. Un espermatograma da información concreta y rápida.'},
+  {id:'condiciones', label:'Tiroides, SOP, endometriosis y miomas', body:'Cada condición afecta al ciclo de forma distinta: la tiroides regula la ovulación, el SOP la vuelve irregular, la endometriosis puede generar inflamación pélvica, y los miomas pueden interferir con la implantación según su ubicación.'},
+  {id:'glosario', label:'Glosario', body:'FSH: hormona que estimula el crecimiento de los folículos. AMH: hormona que indica la reserva ovárica. LH: hormona que dispara la ovulación. Folículo: estructura que contiene al óvulo en desarrollo. Implantación: momento en que el óvulo fecundado se adhiere al útero.'}
+];
+let activeLearnTab = 'reserva';
+function renderLearn(){
+  document.getElementById('learnTabs').innerHTML = LEARN_TABS.map(t=>'<div class="tab '+(t.id===activeLearnTab?'active':'')+'" onclick="setLearnTab(\''+t.id+'\')">'+t.label+'</div>').join('');
+  const tab = LEARN_TABS.find(t=>t.id===activeLearnTab);
+  document.getElementById('learnBody').innerHTML = '<p class="section-body">'+tab.body+'</p>';
+}
+function setLearnTab(id){ activeLearnTab=id; renderLearn(); }
+
+/* ============ INIT ============ */
+loadState();
+</script>
+</body>
+</html>
