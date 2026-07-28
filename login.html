@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingresar — ScoreOvulación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+<style>
+  .auth-wrap{max-width:420px;margin:0 auto;padding:60px 20px 40px;}
+  .auth-field{margin-bottom:14px;}
+  .auth-label{display:block;font-size:12.5px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;}
+  .auth-input{width:100%;padding:14px 16px;border-radius:var(--radius-sm);border:1.5px solid rgba(28,22,32,.14);font-size:14.5px;font-family:'Manrope',sans-serif;color:var(--ink);}
+  .auth-input:focus{outline:none;border-color:var(--accent);}
+  .auth-toggle{display:flex;gap:8px;margin-bottom:22px;background:rgba(28,22,32,.05);padding:5px;border-radius:100px;}
+  .auth-toggle button{flex:1;border:none;background:transparent;padding:10px;border-radius:100px;font-family:'Manrope',sans-serif;font-weight:700;font-size:13px;color:var(--ink-soft);cursor:pointer;}
+  .auth-toggle button.active{background:#fff;color:var(--ink);box-shadow:var(--shadow-soft);}
+  .auth-msg{font-size:13px;margin-top:14px;text-align:center;line-height:1.5;}
+  .auth-msg.error{color:var(--red);}
+  .auth-msg.ok{color:var(--green);}
+  .auth-hint{text-align:center;font-size:12px;color:var(--ink-faint);margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div style="text-align:center;margin-bottom:26px;">
+    <div class="brand" style="justify-content:center;">
+      <span class="dot"></span>ScoreOvulación
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="auth-toggle">
+      <button id="tabLogin" class="active" onclick="setMode('login')" type="button">Ingresar</button>
+      <button id="tabSignup" onclick="setMode('signup')" type="button">Crear cuenta</button>
+    </div>
+
+    <div class="kicker" id="formKicker">Bienvenida de vuelta</div>
+    <h2 class="section-title" id="formTitle" style="font-size:20px;">Ingresa a tu cuenta</h2>
+
+    <form id="authForm">
+      <div class="auth-field" id="nameField" style="display:none;">
+        <label class="auth-label">Tu nombre</label>
+        <input class="auth-input" type="text" id="nombre" autocomplete="name">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Correo electrónico</label>
+        <input class="auth-input" type="email" id="email" required autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Contraseña</label>
+        <input class="auth-input" type="password" id="password" required autocomplete="current-password" minlength="6">
+      </div>
+      <button class="btn btn-primary" type="submit" id="submitBtn" style="margin-top:6px;">Ingresar</button>
+    </form>
+    <div class="auth-msg" id="authMsg"></div>
+  </div>
+
+  <p class="auth-hint">Tu acceso se activa automáticamente tras la compra en Hotmart.<br>Si acabas de comprar, crea tu cuenta con el mismo correo del pago.</p>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+let mode = 'login';
+
+function setMode(m){
+  mode = m;
+  document.getElementById('tabLogin').classList.toggle('active', m==='login');
+  document.getElementById('tabSignup').classList.toggle('active', m==='signup');
+  document.getElementById('nameField').style.display = m==='signup' ? 'block' : 'none';
+  document.getElementById('formKicker').textContent = m==='login' ? 'Bienvenida de vuelta' : 'Primera vez aquí';
+  document.getElementById('formTitle').textContent = m==='login' ? 'Ingresa a tu cuenta' : 'Crea tu cuenta';
+  document.getElementById('submitBtn').textContent = m==='login' ? 'Ingresar' : 'Crear cuenta';
+  document.getElementById('authMsg').textContent = '';
+}
+
+function showMsg(text, type){
+  const el = document.getElementById('authMsg');
+  el.textContent = text;
+  el.className = 'auth-msg ' + (type || '');
+}
+
+document.getElementById('authForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const nombre = document.getElementById('nombre').value.trim();
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = true;
+  showMsg('Un momento...', '');
+
+  try{
+    const supabase = await window.getSupabaseClient();
+
+    if(mode === 'signup'){
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { data: { nombre: nombre || null } }
+      });
+      if(error) throw error;
+
+      if(data.session){
+        window.location.href = 'app.html';
+      } else {
+        showMsg('Cuenta creada. Revisa tu correo para confirmar tu cuenta antes de ingresar.', 'ok');
+      }
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if(error) throw error;
+      window.location.href = 'app.html';
+    }
+  } catch(err){
+    showMsg(traducirError(err.message), 'error');
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+
+function traducirError(msg){
+  if(!msg) return 'Ocurrió un error. Intenta de nuevo.';
+  if(msg.includes('Invalid login credentials')) return 'Correo o contraseña incorrectos.';
+  if(msg.includes('User already registered')) return 'Ya existe una cuenta con este correo. Intenta ingresar.';
+  if(msg.includes('Email not confirmed')) return 'Confirma tu correo antes de ingresar. Revisa tu bandeja de entrada.';
+  if(msg.includes('Password should be at least')) return 'La contraseña debe tener al menos 6 caracteres.';
+  return msg;
+}
+
+// Si ya hay sesión activa, saltar directo a la app (auth-guard.js valida la licencia ahí).
+(async function checkExistingSession(){
+  try{
+    const supabase = await window.getSupabaseClient();
+    const { data } = await supabase.auth.getSession();
+    if(data && data.session) window.location.replace('app.html');
+  }catch(e){ /* silencioso: se queda en el formulario de login */ }
+})();
+</script>
+</body>
+</html>

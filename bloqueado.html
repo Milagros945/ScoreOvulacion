@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Licencia no activa — ScoreOvulación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body>
+<div class="wrap" style="padding-top:70px;">
+  <div style="text-align:center;margin-bottom:26px;">
+    <div class="brand" style="justify-content:center;"><span class="dot"></span>ScoreOvulación</div>
+  </div>
+
+  <div class="card" style="text-align:center;">
+    <div class="kicker">Acceso pendiente</div>
+    <h2 class="section-title">Tu licencia todavía no está activa</h2>
+    <p class="section-body" style="margin-bottom:20px;">
+      Tu cuenta existe, pero aún no detectamos una compra aprobada asociada a este correo.
+      Si acabas de comprar en Hotmart, la activación puede tardar unos minutos.
+    </p>
+    <p class="section-body" style="margin-bottom:24px;">
+      Si el problema continúa, escríbenos a
+      <b>milagrosamezquita43@gmail.com</b> indicando tu correo de compra y tu número de
+      transacción de Hotmart (comienza con "HP").
+    </p>
+    <button class="btn btn-ghost" id="logoutBtn">Cerrar sesión</button>
+  </div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+document.getElementById('logoutBtn').addEventListener('click', async function(){
+  const supabase = await window.getSupabaseClient();
+  await supabase.auth.signOut();
+  window.location.replace('login.html');
+});
+
+// Si el usuario recarga esta página después de que se activó su licencia,
+// lo mandamos directo a la app en vez de dejarlo atrapado aquí.
+(async function recheck(){
+  try{
+    const supabase = await window.getSupabaseClient();
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData && sessionData.session;
+    if(!session){ window.location.replace('login.html'); return; }
+
+    const { data: profile } = await supabase
+      .from('profiles').select('licencia_activa').eq('id', session.user.id).maybeSingle();
+    if(profile && profile.licencia_activa === true){
+      window.location.replace('app.html');
+    }
+  }catch(e){ /* se queda en esta pantalla */ }
+})();
+</script>
+</body>
+</html>

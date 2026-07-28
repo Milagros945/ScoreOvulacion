@@ -1,0 +1,9 @@
+{
+  "name": "scoreovulacion-saas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ScoreOvulación como SaaS: app estática + autenticación Supabase + webhook de licencias Hotmart, desplegado en Vercel.",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  }
+}
