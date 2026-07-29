@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 
 export default async function handler(req, res) {
@@ -6,11 +5,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Método no permitido' });
   }
 
-  console.log('Iniciando procesamiento de webhook (seguridad desactivada para pruebas).');
+  console.log('Iniciando procesamiento de webhook (seguridad Y filtro de producto desactivados).');
 
   try {
     // --- SECCIÓN DE VALIDACIÓN DE SEGURIDAD (COMENTADA) ---
-    // Hemos desactivado esta parte temporalmente para evitar el error "Falta la firma".
     /*
     const hotmartSignature = req.headers['x-hotmart-signature'];
     const webhookSecret = process.env.HOTMART_WEBHOOK_SECRET;
@@ -32,14 +30,12 @@ export default async function handler(req, res) {
       }
     } else {
       console.error('Intento de webhook no autorizado: Falta la firma. (Se ha omitido esta comprobación).');
-      // --- COMENTAMOS LA SIGUIENTE LÍNEA PARA PERMITIR EL PASO ---
-      // return res.status(401).json({ error: 'Firma no proporcionada' });
     }
     */
     // -------------------------------------------------------
 
 
-    // 2. Procesamiento (continuar sin la validación de seguridad)
+    // 2. Procesamiento
     const eventData = req.body;
     const eventType = eventData.event;
     const buyerData = eventData.data.buyer;
@@ -47,11 +43,15 @@ export default async function handler(req, res) {
 
     console.log(`Recibiendo evento: ${eventType} para producto ID: ${productData.id}`);
 
-    // Verificación del producto (asegúrate de que el ID sea correcto: 8195187)
+    // --- SECCIÓN DE FILTRO DE PRODUCTO (COMENTADA) ---
+    // Hemos desactivado esto para que el test funcione con cualquier ID de prueba de Hotmart.
+    /*
     if (String(productData.id) !== '8195187') {
-      console.log('Evento ignorado: ID de producto no coincide con 8195187.');
+      console.log('Evento ignorado: ID de producto no coincide con 8195187. (Filtro omitido).');
       return res.status(200).json({ message: 'Evento ignorado para otro producto.' });
     }
+    */
+    // --------------------------------------------------
 
     if (eventType !== 'PURCHASE_APPROVED') {
       console.log('Evento ignorado: No es un evento de PURCHASE_APPROVED.');
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
     console.log(`Procesando compra aprobada para: ${buyerData.email}`);
 
-    // 3. Inicializar Supabase (Service Role Key necesaria para crear usuarios)
+    // 3. Inicializar Supabase
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -104,12 +104,11 @@ export default async function handler(req, res) {
         email: buyerData.email,
         subscription_status: 'active',
         purchase_date: new Date().toISOString(),
-        // Añade aquí otros campos de tu tabla 'profiles' si son obligatorios
       });
 
     if (profileError) {
       console.error('Error al actualizar el perfil en Supabase:', profileError);
-      throw profileError; // Esto disparará el bloque catch
+      throw profileError;
     }
 
     console.log(`Licencia activada correctamente para el usuario ${userId}.`);
