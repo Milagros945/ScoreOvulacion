@@ -1,121 +1,146 @@
-import { createClient } from '@supabase/supabase-js';
+// POST /api/hotmart-webhook
+//
+// Punto de entrada para el Webhook de Hotmart (Herramientas > Webhook, en el
+// panel de tu producto). Activa o desactiva la licencia del comprador en la
+// tabla `profiles` de Supabase automáticamente.
+//
+// IMPORTANTE ANTES DE ACTIVAR ESTO EN PRODUCCIÓN:
+// El nombre exacto de los campos que envía Hotmart (event, hottok, buyer.email,
+// purchase.transaction, etc.) puede variar según la versión de webhook que
+// actives en tu panel. Antes de usarlo con compras reales:
+//   1. Activa el webhook en modo prueba desde Hotmart y revisa el payload real
+//      que llega (puedes loguearlo temporalmente con console.log(req.body)
+//      y leerlo en Vercel > tu proyecto > Logs).
+//   2. Ajusta los nombres de campo de este archivo si difieren de los que
+//      documenta Hotmart en https://developers.hotmart.com en ese momento.
+//
+// Este archivo ya implementa la lógica de negocio (activar/desactivar,
+// vincular con usuarios que compran antes o después de registrarse), solo
+// puede necesitar un ajuste de nombres de campo según la versión del webhook.
 
-export default async function handler(req, res) {
+const { createClient } = require('@supabase/supabase-js');
+
+const EVENTOS_ACTIVACION = ['PURCHASE_APPROVED', 'PURCHASE_COMPLETE'];
+const EVENTOS_DESACTIVACION = [
+  'PURCHASE_REFUNDED',
+  'PURCHASE_CHARGEBACK',
+  'PURCHASE_CANCELED',
+  'PURCHASE_CANCELLED',
+  'PURCHASE_EXPIRED',
+  'PURCHASE_PROTEST',
+];
+
+function getSupabaseAdmin() {
+  const url = process.env.SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceRoleKey) {
+    throw new Error('Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en las variables de entorno de Vercel.');
+  }
+  // El cliente admin usa la service_role key: bypassa RLS. Nunca se expone al navegador.
+  return createClient(url, serviceRoleKey);
+}
+
+function extraerDatos(body) {
+  // Estructura típica del webhook de Hotmart. Ajusta si tu payload real difiere.
+  const evento = body.event || body.evento || '';
+  const email = body?.data?.buyer?.email || body?.email || '';
+  const nombre = body?.data?.buyer?.name || body?.nome || '';
+  const transaccion = body?.data?.purchase?.transaction || body?.data?.transaction || body?.transaction || '';
+  return { evento, email, nombre, transaccion };
+}
+
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método no permitido' });
+    res.status(405).json({ error: 'Método no permitido' });
+    return;
   }
 
-  console.log('Iniciando procesamiento de webhook (seguridad Y filtro de producto desactivados).');
+  // Verificación del token (Hottok) configurado en el panel de Hotmart.
+  // Hotmart puede enviarlo dentro del body como "hottok" o como query param,
+  // según la versión de webhook. Se aceptan ambas formas.
+  const tokenEsperado = process.env.HOTMART_WEBHOOK_SECRET;
+  const tokenRecibido = req.body?.hottok || req.query?.token;
+  if (!tokenEsperado) {
+    res.status(500).json({ error: 'Falta configurar HOTMART_WEBHOOK_SECRET en Vercel.' });
+    return;
+  }
+  if (tokenRecibido !== tokenEsperado) {
+    res.status(401).json({ error: 'Token de verificación inválido.' });
+    return;
+  }
+
+  const { evento, email, transaccion } = extraerDatos(req.body || {});
+  if (!email) {
+    res.status(400).json({ error: 'El payload no incluyó un correo de comprador.' });
+    return;
+  }
+
+  let supabaseAdmin;
+  try {
+    supabaseAdmin = getSupabaseAdmin();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+    return;
+  }
+
+  const emailNormalizado = String(email).trim().toLowerCase();
 
   try {
-    // --- SECCIÓN DE VALIDACIÓN DE SEGURIDAD (COMENTADA) ---
-    /*
-    const hotmartSignature = req.headers['x-hotmart-signature'];
-    const webhookSecret = process.env.HOTMART_WEBHOOK_SECRET;
-
-    if (!webhookSecret) {
-      console.error('Error crítico: HOTMART_WEBHOOK_SECRET no configurado en Vercel.');
-      return res.status(500).json({ error: 'Error de configuración del servidor' });
+    if (EVENTOS_ACTIVACION.includes(evento)) {
+      await activarLicencia(supabaseAdmin, emailNormalizado, transaccion);
+      res.status(200).json({ ok: true, accion: 'activada', email: emailNormalizado });
+      return;
     }
 
-    if (hotmartSignature) {
-      const calculatedSignature = crypto
-        .createHmac('sha256', webhookSecret)
-        .update(JSON.stringify(req.body))
-        .digest('hex');
-
-      if (hotmartSignature !== calculatedSignature) {
-        console.error('Intento de webhook no autorizado: Firma incorrecta.');
-        return res.status(401).json({ error: 'Firma no válida' });
-      }
-    } else {
-      console.error('Intento de webhook no autorizado: Falta la firma. (Se ha omitido esta comprobación).');
-    }
-    */
-    // -------------------------------------------------------
-
-
-    // 2. Procesamiento
-    const eventData = req.body;
-    const eventType = eventData.event;
-    const buyerData = eventData.data.buyer;
-    const productData = eventData.data.product;
-
-    console.log(`Recibiendo evento: ${eventType} para producto ID: ${productData.id}`);
-
-    // --- SECCIÓN DE FILTRO DE PRODUCTO (COMENTADA) ---
-    // Hemos desactivado esto para que el test funcione con cualquier ID de prueba de Hotmart.
-    /*
-    if (String(productData.id) !== '8195187') {
-      console.log('Evento ignorado: ID de producto no coincide con 8195187. (Filtro omitido).');
-      return res.status(200).json({ message: 'Evento ignorado para otro producto.' });
-    }
-    */
-    // --------------------------------------------------
-
-    if (eventType !== 'PURCHASE_APPROVED') {
-      console.log('Evento ignorado: No es un evento de PURCHASE_APPROVED.');
-      return res.status(200).json({ message: 'Evento ignorado (no es PURCHASE_APPROVED).' });
+    if (EVENTOS_DESACTIVACION.includes(evento)) {
+      await desactivarLicencia(supabaseAdmin, emailNormalizado);
+      res.status(200).json({ ok: true, accion: 'desactivada', email: emailNormalizado });
+      return;
     }
 
-    console.log(`Procesando compra aprobada para: ${buyerData.email}`);
-
-    // 3. Inicializar Supabase
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.error('Error crítico: Variables de entorno de Supabase (URL o Service Key) faltantes en Vercel.');
-      return res.status(500).json({ error: 'Error de configuración de base de datos' });
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // 4. Crear o Actualizar Usuario en Supabase (Auth)
-    let userId;
-    const { data: existingUser } = await supabase.auth.admin.getUserByEmail(buyerData.email);
-
-    if (existingUser) {
-      userId = existingUser.user.id;
-      console.log(`El usuario ya existe: ${userId}`);
-    } else {
-      console.log(`Creando nuevo usuario para: ${buyerData.email}`);
-      const { data: newUser, error: createUserError } = await supabase.auth.admin.createUser({
-        email: buyerData.email,
-        email_confirm: true, // Confirmar email automáticamente
-        user_metadata: { full_name: buyerData.name },
-      });
-
-      if (createUserError) {
-        console.error('Error al crear el usuario en Supabase Auth:', createUserError);
-        throw createUserError; // Esto disparará el bloque catch
-      }
-      userId = newUser.user.id;
-      console.log(`Usuario creado exitosamente: ${userId}`);
-    }
-
-    // 5. Actualizar Registro en la Tabla 'profiles'
-    console.log(`Actualizando perfil para el usuario: ${userId}`);
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .upsert({
-        id: userId,
-        full_name: buyerData.name,
-        email: buyerData.email,
-        subscription_status: 'active',
-        purchase_date: new Date().toISOString(),
-      });
-
-    if (profileError) {
-      console.error('Error al actualizar el perfil en Supabase:', profileError);
-      throw profileError;
-    }
-
-    console.log(`Licencia activada correctamente para el usuario ${userId}.`);
-    return res.status(200).json({ message: 'Usuario creado y licencia activada correctamente.' });
-
-  } catch (error) {
-    console.error('Error general procesando el webhook:', error);
-    return res.status(500).json({ error: 'Error interno del servidor durante el procesamiento.' });
+    // Evento no manejado (por ejemplo, un evento informativo). Se responde 200
+    // para que Hotmart no reintente indefinidamente un evento que no nos interesa.
+    res.status(200).json({ ok: true, accion: 'ignorado', evento });
+  } catch (err) {
+    console.error('Error procesando webhook de Hotmart:', err);
+    res.status(500).json({ error: 'Error interno al procesar el webhook.' });
   }
+};
+
+async function activarLicencia(supabaseAdmin, email, transaccion) {
+  const ahora = new Date().toISOString();
+
+  // Caso 1: el comprador ya tiene cuenta (profiles.email coincide) -> activar directo.
+  const { data: actualizados, error: errUpdate } = await supabaseAdmin
+    .from('profiles')
+    .update({ licencia_activa: true, fecha_compra: ahora, transaccion_hotmart: transaccion })
+    .eq('email', email)
+    .select('id');
+
+  if (errUpdate) throw errUpdate;
+
+  if (actualizados && actualizados.length > 0) return;
+
+  // Caso 2: todavía no tiene cuenta -> guardar en licencias_pendientes.
+  // Cuando la persona se registre con este mismo correo, un trigger en la
+  // base de datos activa su perfil automáticamente (ver sql/schema.sql).
+  const { error: errUpsert } = await supabaseAdmin
+    .from('licencias_pendientes')
+    .upsert(
+      { email, transaccion_hotmart: transaccion, fecha_compra: ahora },
+      { onConflict: 'email' }
+    );
+
+  if (errUpsert) throw errUpsert;
+}
+
+async function desactivarLicencia(supabaseAdmin, email) {
+  const { error } = await supabaseAdmin
+    .from('profiles')
+    .update({ licencia_activa: false })
+    .eq('email', email);
+  if (error) throw error;
+
+  // Si había una activación pendiente sin registrar, se limpia también.
+  await supabaseAdmin.from('licencias_pendientes').delete().eq('email', email);
 }
