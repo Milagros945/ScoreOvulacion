@@ -58,22 +58,21 @@ module.exports = async function handler(req, res) {
   // Verificación del token (Hottok) configurado en el panel de Hotmart.
   // Hotmart puede enviarlo dentro del body como "hottok" o como query param,
   // según la versión de webhook. Se aceptan ambas formas.
-  const tokenEsperado = process.env.HOTMART_WEBHOOK_SECRET;
-  const tokenRecibido = req.body?.hottok || req.query?.token;
+  const tokenEsperado = (process.env.HOTMART_WEBHOOK_SECRET || '').trim();
+  const tokenRecibidoRaw = req.body?.hottok || req.query?.token || '';
+  const tokenRecibido = String(tokenRecibidoRaw).trim();
   if (!tokenEsperado) {
     res.status(500).json({ error: 'Falta configurar HOTMART_WEBHOOK_SECRET en Vercel.' });
     return;
   }
-  // DEBUG TEMPORAL: no expone los valores completos, solo longitud y últimos
-  // caracteres, para poder comparar en los Logs de Vercel sin filtrar el secreto.
-  console.log('DEBUG token', {
-    esperado_len: tokenEsperado.length,
-    esperado_final: tokenEsperado.slice(-4),
-    recibido_len: tokenRecibido ? tokenRecibido.length : 0,
-    recibido_final: tokenRecibido ? tokenRecibido.slice(-4) : null,
-    llego_en: req.body?.hottok ? 'body' : (req.query?.token ? 'query' : 'ninguno'),
-  });
   if (tokenRecibido !== tokenEsperado) {
+    console.log('DEBUG token mismatch', {
+      esperado_len: tokenEsperado.length,
+      esperado_final: tokenEsperado.slice(-4),
+      recibido_len: tokenRecibido.length,
+      recibido_final: tokenRecibido.slice(-4),
+      llego_en: req.body?.hottok ? 'body' : (req.query?.token ? 'query' : 'ninguno'),
+    });
     res.status(401).json({ error: 'Token de verificación inválido.' });
     return;
   }
