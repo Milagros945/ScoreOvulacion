@@ -64,6 +64,15 @@ module.exports = async function handler(req, res) {
     res.status(500).json({ error: 'Falta configurar HOTMART_WEBHOOK_SECRET en Vercel.' });
     return;
   }
+  // DEBUG TEMPORAL: no expone los valores completos, solo longitud y últimos
+  // caracteres, para poder comparar en los Logs de Vercel sin filtrar el secreto.
+  console.log('DEBUG token', {
+    esperado_len: tokenEsperado.length,
+    esperado_final: tokenEsperado.slice(-4),
+    recibido_len: tokenRecibido ? tokenRecibido.length : 0,
+    recibido_final: tokenRecibido ? tokenRecibido.slice(-4) : null,
+    llego_en: req.body?.hottok ? 'body' : (req.query?.token ? 'query' : 'ninguno'),
+  });
   if (tokenRecibido !== tokenEsperado) {
     res.status(401).json({ error: 'Token de verificación inválido.' });
     return;
@@ -123,24 +132,4 @@ async function activarLicencia(supabaseAdmin, email, transaccion) {
 
   // Caso 2: todavía no tiene cuenta -> guardar en licencias_pendientes.
   // Cuando la persona se registre con este mismo correo, un trigger en la
-  // base de datos activa su perfil automáticamente (ver sql/schema.sql).
-  const { error: errUpsert } = await supabaseAdmin
-    .from('licencias_pendientes')
-    .upsert(
-      { email, transaccion_hotmart: transaccion, fecha_compra: ahora },
-      { onConflict: 'email' }
-    );
-
-  if (errUpsert) throw errUpsert;
-}
-
-async function desactivarLicencia(supabaseAdmin, email) {
-  const { error } = await supabaseAdmin
-    .from('profiles')
-    .update({ licencia_activa: false })
-    .eq('email', email);
-  if (error) throw error;
-
-  // Si había una activación pendiente sin registrar, se limpia también.
-  await supabaseAdmin.from('licencias_pendientes').delete().eq('email', email);
-}
+  // base de
