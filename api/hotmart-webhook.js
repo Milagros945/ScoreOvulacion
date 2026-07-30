@@ -132,4 +132,24 @@ async function activarLicencia(supabaseAdmin, email, transaccion) {
 
   // Caso 2: todavía no tiene cuenta -> guardar en licencias_pendientes.
   // Cuando la persona se registre con este mismo correo, un trigger en la
-  // base de
+  // base de datos activa su perfil automáticamente (ver sql/schema.sql).
+  const { error: errUpsert } = await supabaseAdmin
+    .from('licencias_pendientes')
+    .upsert(
+      { email, transaccion_hotmart: transaccion, fecha_compra: ahora },
+      { onConflict: 'email' }
+    );
+
+  if (errUpsert) throw errUpsert;
+}
+
+async function desactivarLicencia(supabaseAdmin, email) {
+  const { error } = await supabaseAdmin
+    .from('profiles')
+    .update({ licencia_activa: false })
+    .eq('email', email);
+  if (error) throw error;
+
+  // Si había una activación pendiente sin registrar, se limpia también.
+  await supabaseAdmin.from('licencias_pendientes').delete().eq('email', email);
+}
